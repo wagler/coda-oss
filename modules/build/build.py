@@ -21,8 +21,11 @@ class CPPBuildContext(BuildContext):
         Builds a module, along with optional tests.
         It makes assumptions, but most can be overridden by passing in args.
         """
+        
         bld = self
-        variant = bld.env['VARIANT'] or 'default'
+        variant = Options.options.variants and Options.options.variants[0] or bld.env['DEFAULT_VARIANT']
+#        variant = '%s-%s' % (bld.env['PLATFORM'], variant)
+#        variant = bld.env['VARIANT'] or 'default'
         env = bld.env_of_name(variant)
         env.set_variant(variant)
     
@@ -53,7 +56,7 @@ class CPPBuildContext(BuildContext):
                     target=targetName, name=libName, export_incdirs=exportIncludes,
                     uselib_local=uselib_local, uselib=uselib, env=env.copy(),
                     defines=defines, path=path, install_path='${PREFIX}/lib')
-            lib.find_sources_in_dirs('source')
+            lib.find_sources_in_dirs(modArgs.get('source_dir', 'source'))
             lib.source = filter(modArgs.get('source_filter', None), lib.source)
             
             if libVersion is not None and sys.platform != 'win32' and Options.options.symlinks:
@@ -88,7 +91,9 @@ class CPPBuildContext(BuildContext):
         plugin (via the plugin kwarg).
         """
         bld = self
-        variant = bld.env['VARIANT'] or 'default'
+        variant = Options.options.variants and Options.options.variants[0] or bld.env['DEFAULT_VARIANT']
+#        variant = '%s-%s' % (bld.env['PLATFORM'], variant)
+#        variant = bld.env['VARIANT'] or 'default'
         env = bld.env_of_name(variant)
         env.set_variant(variant)
         
@@ -118,7 +123,9 @@ class CPPBuildContext(BuildContext):
         Builds a program (exe)
         """
         bld = self
-        variant = bld.env['VARIANT'] or 'default'
+        variant = Options.options.variants and Options.options.variants[0] or bld.env['DEFAULT_VARIANT']
+#        variant = '%s-%s' % (bld.env['PLATFORM'], variant)
+#        variant = bld.env['VARIANT'] or 'default'
         env = bld.env_of_name(variant)
         env.set_variant(variant)
         
@@ -140,6 +147,21 @@ class CPPBuildContext(BuildContext):
         if not source:
             exe.find_sources_in_dirs(modArgs.get('sourcedir', 'source'))
             exe.source = filter(modArgs.get('source_filter', None), exe.source)
+    
+    
+    def cloneVariants(self):
+        bld = self
+        
+        # only cloning variants if NOT installing
+        # if you are in an install phase, only the first variant will be
+        # installed - this is in order to not have the files clash
+        
+        if not bld.is_install:
+            variants = Options.options.variants and Options.options.variants[1:] or []
+            for i, v in enumerate(variants):
+#                variant = '%s-%s' % (bld.env['PLATFORM'], v)
+                for obj in [] + bld.all_task_gen:
+                    obj.clone(v)
 
 
 class GlobDirectoryWalker:
@@ -237,32 +259,46 @@ def set_options(opt):
     if Options.platform == 'win32':
         opt.tool_options('msvc')
     
+    ############################################################################
+    ### CONFIGURE OPTIONS
     opt.add_option('--enable-warnings', action='store_true', dest='warnings',
-                   help='Enable warnings')
-    opt.add_option('--enable-debugging', action='store_true', dest='debugging',
-                   help='Enable debugging')
-    opt.add_option('--enable-64bit', action='store_true', dest='enable64',
-                   help='Enable 64bit builds')
-    opt.add_option('--enable-doxygen', action='store_true', dest='doxygen',
-                   help='Enable running doxygen')
+                   help='Enable warnings (configure option)')
+#    opt.add_option('--enable-debugging', action='store_true', dest='debugging',
+#                   help='Enable debugging')
+#    opt.add_option('--enable-64bit', action='store_true', dest='enable64',
+#                   help='Enable 64bit builds')
     opt.add_option('--with-cflags', action='store', nargs=1, dest='cflags',
-                   help='Set non-standard CFLAGS', metavar='FLAGS')
+                   help='Set non-standard CFLAGS (configure option)', metavar='FLAGS')
     opt.add_option('--with-cxxflags', action='store', nargs=1, dest='cxxflags',
-                   help='Set non-standard CXXFLAGS (C++)', metavar='FLAGS')
+                   help='Set non-standard CXXFLAGS (C++) (configure option)', metavar='FLAGS')
     opt.add_option('--with-defs', action='store', nargs=1, dest='_defs',
-                   help='Use DEFS as macro definitions', metavar='DEFS')
+                   help='Use DEFS as macro definitions (configure option)', metavar='DEFS')
+    opt.add_option('--default-variant', action='store', nargs=1, dest='_defVariant',
+                   help='Specify the default variant to build if none are specified at build time (configure option)',
+                   metavar='VARIANT', default='release')
     opt.add_option('--with-optz', action='store',
                    choices=['med', 'fast', 'fastest'],
                    default='fastest', metavar='OPTZ',
-                   help='Specify the optimization level for optimized/release builds')
-    opt.add_option('--libs-only', action='store_true', dest='libs_only',
-                   help='Only build the libs (skip building the tests, etc.)')
-    opt.add_option('--shared', action='store_true', dest='shared_libs',
-                   help='Build all libs as shared libs')
-    opt.add_option('--disable-symlinks', action='store_false', dest='symlinks',
-                   default=True, help='Disable creating symlinks for libs')
+                   help='Specify the optimization level for optimized/release builds (configure option)')
     
-
+    ############################################################################
+    ### BUILD OPTIONS
+    opt.add_option('--enable-doxygen', action='store_true', dest='doxygen',
+                   help='Enable running doxygen (build option)')
+    opt.add_option('--libs-only', action='store_true', dest='libs_only',
+                   help='Only build the libs (skip building the tests, etc.) (build option)')
+    opt.add_option('--shared', action='store_true', dest='shared_libs',
+                   help='Build all libs as shared libs (build option)')
+    opt.add_option('--disable-symlinks', action='store_false', dest='symlinks',
+                   default=True, help='Disable creating symlinks for libs (build option)')
+    
+    def splitVariants(option, opt_str, value, parser):
+        setattr(parser.values, option.dest, value.split(','))
+    
+    opt.add_option('--variants', '--variant', action='callback',
+                   dest='variants', type='str',
+                   metavar='VARIANTS', help='Specify the build variant(s) (build option)',
+                   callback=splitVariants)
     
 
 types_str = '''
@@ -379,6 +415,8 @@ def detect(self):
     
     env['LIB_TYPE'] = Options.options.shared_libs and 'shlib' or 'staticlib'
     
+    env['DEFAULT_VARIANT'] = Options.options._defVariant
+    
     env.append_unique('CXXFLAGS', Options.options.cxxflags or '')
     env.append_unique('CCFLAGS', Options.options.cflags or '')
     if Options.options._defs:
@@ -390,82 +428,43 @@ def detect(self):
     sparcRegex = r'sparc-sun.*'
     winRegex = r'win32'
     
-    config = {'cxx':{}, 'cc':{}}
+    config = {'cxx':{}, 'cc':{}, 'both':{}}
 
     #apple
     if re.match(appleRegex, platform):
-        env.append_value('LIB_DL', 'dl')
-        env.append_value('LIB_NSL', 'nsl')
-        env.append_value('LIB_THREAD', 'pthread')
-        self.check_cc(lib='pthread', mandatory=True)
+        self.check_cc(lib="pthread", mandatory=True, uselib_store='THREAD')
 
-        config['cxx']['debug']          = '-g'
-        config['cxx']['warn']           = '-Wall'
-        config['cxx']['verbose']        = '-v'
-        config['cxx']['64']             = '-m64'
-        config['cxx']['32']             = '-m32'
-        config['cxx']['optz_med']       = '-O1'
-        config['cxx']['optz_fast']      = '-O2'
-        config['cxx']['optz_fastest']   = '-O3'
-
-        env.append_value('CXXDEFINES', '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE __POSIX'.split())
-        env.append_value('LINKFLAGS', '-fPIC -dynamiclib'.split())
-        env.append_value('CXXFLAGS', '-fPIC')
-        env.append_value('CXXFLAGS_THREAD', '-D_REENTRANT')
-
-        config['cc']['debug']          = config['cxx']['debug']
-        config['cc']['warn']           = config['cxx']['warn']
-        config['cc']['verbose']        = config['cxx']['verbose']
-        config['cc']['64']             = config['cxx']['64']
-        config['cc']['optz_med']       = config['cxx']['optz_med']
-        config['cc']['optz_fast']      = config['cxx']['optz_fast']
-        config['cc']['optz_fastest']   = config['cxx']['optz_fastest']
-
-        env.append_value('CCDEFINES', '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE __POSIX'.split())
-        env.append_value('CCFLAGS', '-fPIC -dynamiclib'.split())
-        env.append_value('CCFLAGS_THREAD', '-D_REENTRANT')
+        config['both']['debug']         = '-g'
+        config['both']['warn']          = '-Wall'
+        config['both']['verbose']       = '-v'
+        config['both']['64']            = '-m64'
+        config['both']['32']            = '-m32'
+        config['both']['optz_med']      = '-O1'
+        config['both']['optz_fast']     = '-O2'
+        config['both']['optz_fastest']  = '-O3'
+        
+        config['both']['defines']       = '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE __POSIX'.split()
+        config['both']['linkflags']     = '-fPIC -dynamiclib'.split()
+        config['both']['libs']          = {'DL':'dl', 'NSL':'nsl', 'THREAD':'pthread'}
+        config['both']['flags']         = {'':'-fPIC -dynamiclib'.split(),
+                                           'THREAD':'-D_REENTRANT'}
 
     #linux
     elif re.match(linuxRegex, platform):
-        env.append_value('LIB_DL', 'dl')
-        env.append_value('LIB_NSL', 'nsl')
-        env.append_value('LIB_THREAD', 'pthread')
-        env.append_value('LIB_MATH', 'm')
-
-        self.check_cc(lib='pthread', mandatory=True)
-
-        if cxxCompiler == 'g++':
-            config['cxx']['debug']          = '-g'
-            config['cxx']['warn']           = '-Wall'
-            config['cxx']['verbose']        = '-v'
-            config['cxx']['64']             = '-m64'
-            config['cxx']['32']             = '-m32'
-            config['cxx']['optz_med']       = '-O1'
-            config['cxx']['optz_fast']      = '-O2'
-            config['cxx']['optz_fastest']   = '-O3'
-            
-            env.append_value('CXXDEFINES', '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE __POSIX'.split())
-            env.append_value('LINKFLAGS', '-Wl,-E -fPIC'.split())
-            env.append_value('CXXFLAGS', '-fPIC')
-            
-            #for some reason using CXXDEFINES_THREAD won't work w/uselib... so using FLAGS instead
-            env.append_value('CXXFLAGS_THREAD', '-D_REENTRANT')
+        config['both']['debug']         = '-g'
+        config['both']['warn']          = '-Wall'
+        config['both']['verbose']       = '-v'
+        config['both']['64']            = '-m64'
+        config['both']['32']            = '-m32'
+        config['both']['optz_med']      = '-O1'
+        config['both']['optz_fast']     = '-O2'
+        config['both']['optz_fastest']  = '-O3'
         
-        if ccCompiler == 'gcc':
-            config['cc']['debug']          = '-g'
-            config['cc']['warn']           = '-Wall'
-            config['cc']['verbose']        = '-v'
-            config['cc']['64']             = '-m64'
-            config['cc']['32']             = '-m32'
-            config['cc']['optz_med']       = '-O1'
-            config['cc']['optz_fast']      = '-O2'
-            config['cc']['optz_fastest']   = '-O3'
-            
-            env.append_value('CCDEFINES', '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE __POSIX'.split())
-            env.append_value('CCFLAGS', '-fPIC'.split())
-            
-            #for some reason using CXXDEFINES_THREAD won't work w/uselib... so using FLAGS instead
-            env.append_value('CCFLAGS_THREAD', '-D_REENTRANT')
+        config['both']['defines']       = '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE __POSIX'.split()
+        config['both']['linkflags']     = {'':'-Wl,-E -fPIC'.split()}
+        config['both']['libs']          = {'DL':'dl', 'NSL':'nsl', 'THREAD':'pthread', 'MATH':'m'}
+        #for some reason using CXXDEFINES_THREAD won't work w/uselib... so using FLAGS instead
+        config['both']['flags']         = {'':'-fPIC', 'THREAD':'-D_REENTRANT'}
     
     #Solaris
     elif re.match(sparcRegex, platform):
@@ -550,43 +549,129 @@ def detect(self):
     else:
         self.fatal('OS/platform currently unsupported: %s' % platform)
     
-    #CXX
-    if Options.options.warnings:
-        env.append_value('CXXFLAGS', config['cxx'].get('warn', ''))
-        env.append_value('CCFLAGS', config['cc'].get('warn', ''))
-    else:
-        env.append_value('CXXFLAGS', config['cxx'].get('nowarn', ''))
-        env.append_value('CCFLAGS', config['cc'].get('nowarn', ''))
-    if Options.options.verbose:
-        env.append_value('CXXFLAGS', config['cxx'].get('verbose', ''))
-        env.append_value('CCFLAGS', config['cc'].get('verbose', ''))
     
+    def setEnv(env, config, key, suffix='FLAGS'):
+        if key in config['cxx']:
+            env.append_value('CXX%s' % suffix, config['cxx'][key])
+        if key in config['cc']:
+            env.append_value('CC%s' % suffix, config['cc'][key])
+        if key in config['both']:
+            env.append_value('CC%s' % suffix, config['both'][key])
+            env.append_value('CXX%s' % suffix, config['both'][key])
     
-    variant = env.copy() 
-    if Options.options.debugging:
-        variantName = '%s-debug' % platform
-        variant.append_value('CXXFLAGS', config['cxx'].get('debug', ''))
-        variant.append_value('CCFLAGS', config['cc'].get('debug', ''))
-    else:
-        variantName = '%s-release' % platform
-        optz = Options.options.with_optz
-        variant.append_value('CXXFLAGS', config['cxx'].get('optz_%s' % optz, ''))
-        variant.append_value('CCFLAGS', config['cc'].get('optz_%s' % optz, ''))
+    def checkLibs(env, config):
+        libs = {}
+        for k in ['cxx', 'cc', 'both']:
+            if 'libs' in config[k]:
+                libs.update(config[k]['libs'])
+        for libStore, lib in libs.iteritems():
+            self.check_cc(lib=lib, mandatory=True, uselib_store=libStore)
     
-    if Options.options.enable64:
-        variantName = '%s-64' % variantName
-        variant.append_value('CXXFLAGS', config['cxx'].get('64', ''))
-        variant.append_value('CCFLAGS', config['cc'].get('64', ''))
-    else:
-        variant.append_value('CXXFLAGS', config['cxx'].get('32', ''))
-        variant.append_value('CCFLAGS', config['cc'].get('32', ''))
+    def setFlags(env, config):
+        flags = {'cxx':{}, 'cc':{}}
+        if 'flags' in config['cxx']:
+            flags['cxx'].update(config['cxx']['flags'])
+        if 'flags' in config['cc']:
+            flags['cc'].update(config['cc']['flags'])
+        if 'flags' in config['both']:
+            flags['cxx'].update(config['both']['flags'])
+            flags['cc'].update(config['both']['flags'])
         
-    self.set_env_name(variantName, variant)
-    variant.set_variant(variantName)
-    env.set_variant(variantName)
-    self.setenv(variantName)
+        for k, v in flags['cxx'].iteritems():
+            suffix = k and '_%s' % k or ''
+            env.append_value('CXXFLAGS%s' % suffix, v)
+        for k, v in flags['cc'].iteritems():
+            suffix = k and '_%s' % k or ''
+            env.append_value('CCFLAGS%s' % suffix, v)
     
-    env['VARIANT'] = variant['VARIANT'] = variantName
+    def setLinkFlags(env, config):
+        flags = {}
+        for k in ['cxx', 'cc', 'both']:
+            if 'linkflags' in config[k]:
+                flags.update(config[k]['linkflags'])
+        for k, v in flags.iteritems():
+            suffix = k and '_%s' % k or ''
+            env.append_value('LINKFLAGS%s' % suffix, v)
+    
+    # Check that the libs exist
+    checkLibs(env, config)
+    
+    # General purpose flags
+    setFlags(env, config)
+    setLinkFlags(env, config)
+    
+    # DEFINES
+    setEnv(env, config, 'defines', suffix='DEFINES')
+    
+    # WARNINGS
+    if Options.options.warnings:
+        setEnv(env, config, 'warn')
+    else:
+        setEnv(env, config, 'nowarn')
+    
+    # VERBOSE
+    if Options.options.verbose:
+        setEnv(env, config, 'verbose')
+    
+    
+    
+    # DEBUG 32 VARIANT
+    debug = env.copy()
+    debug.set_variant('debug')
+    self.set_env_name('debug', debug)
+    setEnv(debug, config, 'debug')
+    
+    # RELEASE 32 VARIANT
+    release = env.copy()
+    optz = 'optz_%s' % Options.options.with_optz
+    release.set_variant('release')
+    self.set_env_name('release', release)
+    setEnv(release, config, optz)
+    
+    
+    # TODO add a check to make sure the system actualy supports 64bit
+    
+    # DEBUG 64 VARIANT
+    debug64 = debug.copy()
+    debug64.set_variant('debug64')
+    self.set_env_name('debug64', debug64)
+    setEnv(debug64, config, '64')
+    
+    # RELEASE 64 VARIANT
+    release64 = release.copy()
+    release64.set_variant('release64')
+    self.set_env_name('release64', release64)
+    setEnv(release64, config, '64')
+    
+    # now, set the debug/release 32 flags
+    setEnv(debug, config, '32')
+    setEnv(release, config, '32')
+    
+    
+#    variant = env.copy()
+#    if Options.options.debugging:
+#        variantName = '%s-debug' % platform
+#        setEnv(env, config, 'debug')
+#    else:
+#        variantName = '%s-release' % platform
+#        optz = 'optz_%s' % Options.options.with_optz
+#        setEnv(env, config, optz)
+#
+#    
+#    
+#    # 64/32 BIT
+#    if Options.options.enable64:
+#        variantName = '%s-64' % variantName
+#        setEnv(env, config, '64')
+#    else:
+#        setEnv(env, config, '32')
+        
+#    self.set_env_name(variantName, variant)
+#    variant.set_variant(variantName)
+#    env.set_variant(variantName)
+#    self.setenv(variantName)
+#    
+#    env['VARIANT'] = variant['VARIANT'] = variantName
 
 
 @taskgen
