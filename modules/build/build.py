@@ -596,7 +596,6 @@ def detect(self):
     debug.set_variant('debug')
     self.set_env_name('debug', debug)
     setEnv(debug, config, 'debug')
-    setLinkFlags(debug, config, '_32')
     
     # RELEASE 32 VARIANT
     release = env.copy()
@@ -604,7 +603,6 @@ def detect(self):
     release.set_variant('release')
     self.set_env_name('release', release)
     setEnv(release, config, optz)
-    setLinkFlags(debug, config, '_32')
     
     
     # TODO add a check to make sure the system actualy supports 64bit
@@ -624,6 +622,10 @@ def detect(self):
     # now, set the debug/release 32 flags
     setEnv(debug, config, '32')
     setEnv(release, config, '32')
+    setLinkFlags(debug, config, '_32')
+    setLinkFlags(release, config, '_32')
+    setLinkFlags(debug64, config, '_64')
+    setLinkFlags(release64, config, '_64')
     
     
 @taskgen
