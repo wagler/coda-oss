@@ -31,5 +31,4 @@ def init(context):
     
     #also, override the build/target directory
     global blddir
-    blddir = '%s-%s' % (blddir, platform)
-    
+    blddir = os.path.join(blddir, platform)

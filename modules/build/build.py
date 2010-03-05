@@ -24,8 +24,6 @@ class CPPBuildContext(BuildContext):
         
         bld = self
         variant = Options.options.variants and Options.options.variants[0] or bld.env['DEFAULT_VARIANT']
-#        variant = '%s-%s' % (bld.env['PLATFORM'], variant)
-#        variant = bld.env['VARIANT'] or 'default'
         env = bld.env_of_name(variant)
         env.set_variant(variant)
     
@@ -33,7 +31,8 @@ class CPPBuildContext(BuildContext):
         lang = modArgs.get('lang', 'c++')
         libExeType = {'c++':'cxx', 'c':'cc'}.get(lang, 'cxx')
         libName = '%s-%s' % (modArgs['name'], lang)
-        path = 'dir' in modArgs and bld.path.find_dir(modArgs['dir']) or bld.path
+        path = modArgs.get('path',
+                           'dir' in modArgs and bld.path.find_dir(modArgs['dir']) or bld.path)
 
         module_deps = map(lambda x: '%s-%s' % (x, lang), modArgs.get('module_deps', '').split())
         defines = modArgs.get('defines', '').split()
@@ -92,15 +91,14 @@ class CPPBuildContext(BuildContext):
         """
         bld = self
         variant = Options.options.variants and Options.options.variants[0] or bld.env['DEFAULT_VARIANT']
-#        variant = '%s-%s' % (bld.env['PLATFORM'], variant)
-#        variant = bld.env['VARIANT'] or 'default'
         env = bld.env_of_name(variant)
         env.set_variant(variant)
         
         modArgs = dict((k.lower(), v) for k, v in modArgs.iteritems())
         libName = '%s-c++' % modArgs['name']
         plugin = modArgs.get('plugin', '')
-        path = 'dir' in modArgs and bld.path.find_dir(modArgs['dir']) or bld.path
+        path = modArgs.get('path',
+                           'dir' in modArgs and bld.path.find_dir(modArgs['dir']) or bld.path)
 
         module_deps = map(lambda x: '%s-c++' % x, modArgs.get('module_deps', '').split())
         defines = modArgs.get('defines', '').split() + ['PLUGIN_MODULE_EXPORTS']
@@ -124,14 +122,13 @@ class CPPBuildContext(BuildContext):
         """
         bld = self
         variant = Options.options.variants and Options.options.variants[0] or bld.env['DEFAULT_VARIANT']
-#        variant = '%s-%s' % (bld.env['PLATFORM'], variant)
-#        variant = bld.env['VARIANT'] or 'default'
         env = bld.env_of_name(variant)
         env.set_variant(variant)
         
         modArgs = dict((k.lower(), v) for k, v in modArgs.iteritems())
         progName = modArgs['name']
-        path = 'dir' in modArgs and bld.path.find_dir(modArgs['dir']) or bld.path
+        path = modArgs.get('path',
+                           'dir' in modArgs and bld.path.find_dir(modArgs['dir']) or bld.path)
 
         deps = map(lambda x: '%s-c++' % x, modArgs.get('module_deps', '').split())
         defines = modArgs.get('defines', '').split()
@@ -468,53 +465,35 @@ def detect(self):
     
     #Solaris
     elif re.match(sparcRegex, platform):
-        env.append_value('LIB_DL', 'dl')
-        env.append_value('LIB_NSL', 'nsl')
-        env.append_value('LIB_SOCKET', 'socket')
-        env.append_value('LIB_THREAD', 'thread')
-        env.append_value('LIB_MATH', 'm')
-        env.append_value('LIB_CRUN', 'Crun')
-        env.append_value('LIB_CSTD', 'Cstd')
-        self.check_cc(lib='thread', mandatory=True)
-
-        if cxxCompiler == 'sunc++':
-            config['cxx']['debug']          = '-g'
-            config['cxx']['warn']           = ''
-            config['cxx']['verbose']        = '-v'
-            config['cxx']['64']             = '-xtarget=generic64'
-            config['cxx']['32']             = '-xtarget=generic'
-            config['cxx']['optz_med']       = '-xO3'
-            config['cxx']['optz_fast']      = '-xO4'
-            config['cxx']['optz_fastest']   = '-fast'
-            env['shlib_CXXFLAGS']            = ['-KPIC', '-DPIC']
-
-            env.append_value('CXXDEFINES', '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE'.split())
-            env.append_value('CXXFLAGS', '-KPIC -instances=global'.split())
-            env.append_value('CXXFLAGS_THREAD', '-mt')
-            
-        if ccCompiler == 'suncc':
-            config['cc']['debug']          = '-g'
-            config['cc']['warn']           = ''
-            config['cc']['verbose']        = '-v'
-            config['cc']['64']             = '-xtarget=generic64'
-            config['cc']['32']             = '-xtarget=generic'
-            config['cc']['optz_med']       = '-xO2'
-            config['cc']['optz_fast']      = '-xO3'
-            config['cc']['optz_fastest']   = '-fast'
-            env['shlib_CCFLAGS']            = ['-KPIC', '-DPIC']
-
-            env.append_value('CCDEFINES', '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE'.split())
-            env.append_value('CCFLAGS', '-KPIC'.split())
-            env.append_value('CCFLAGS_THREAD', '-mt')
-
-        if Options.options.enable64:
-            env.append_value('LINKFLAGS', config['cc']['64'].split())
-        else:
-            env.append_value('LINKFLAGS', config['cc']['32'].split())
-
-    
-    elif re.match(winRegex, platform):
         
+        config['both']['debug']         = '-g'
+        config['both']['warn']          = ''
+        config['both']['verbose']       = '-v'
+        config['both']['64']            = '-xtarget=generic64'
+        config['both']['linkflags_64']  = config['both']['64']
+        config['both']['32']            = '-xtarget=generic'
+        config['both']['linkflags_32']  = config['both']['32']
+        config['both']['optz_med']      = '-xO3'
+        config['both']['optz_fast']     = '-xO4'
+        config['both']['optz_fastest']  = '-fast'
+        
+        config['both']['flags']         = {'':'-fPIC', 'THREAD':'-mt'}
+        config['cc']['flags']           = {'':'-kPIC'}
+        config['cxx']['flags']          = {'':'-KPIC -instances=global'.split()}
+        
+        config['both']['defines']       = '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE'.split()
+        config['both']['linkflags_64']  = '-xtarget=generic64'
+        config['both']['libs']          = {'DL':'dl', 'NSL':'nsl', 'SOCKET':'socket',
+                                           'THREAD':'thread', 'MATH':'m',
+                                           'CRUN':'Crun', 'CSTD':'Cstd'}
+        
+        #for all solaris envs
+        env['shlib_CCFLAGS']            = ['-KPIC', '-DPIC']
+
+    elif re.match(winRegex, platform):
+        ################################
+        # TODO
+        ################################
         env.append_value('LIB_RPC', 'rpcrt4')
         env.append_value('LIB_SOCKET', 'Ws2_32')
         
@@ -548,7 +527,6 @@ def detect(self):
     
     else:
         self.fatal('OS/platform currently unsupported: %s' % platform)
-    
     
     def setEnv(env, config, key, suffix='FLAGS'):
         if key in config['cxx']:
@@ -584,14 +562,14 @@ def detect(self):
             suffix = k and '_%s' % k or ''
             env.append_value('CCFLAGS%s' % suffix, v)
     
-    def setLinkFlags(env, config):
+    def setLinkFlags(env, config, suffix=''):
         flags = {}
         for k in ['cxx', 'cc', 'both']:
-            if 'linkflags' in config[k]:
-                flags.update(config[k]['linkflags'])
+            if 'linkflags%s' % suffix in config[k]:
+                flags.update(config[k]['linkflags%s' % suffix])
         for k, v in flags.iteritems():
-            suffix = k and '_%s' % k or ''
-            env.append_value('LINKFLAGS%s' % suffix, v)
+            s = k and '_%s' % k or ''
+            env.append_value('LINKFLAGS%s' % s, v)
     
     # Check that the libs exist
     checkLibs(env, config)
@@ -614,12 +592,12 @@ def detect(self):
         setEnv(env, config, 'verbose')
     
     
-    
     # DEBUG 32 VARIANT
     debug = env.copy()
     debug.set_variant('debug')
     self.set_env_name('debug', debug)
     setEnv(debug, config, 'debug')
+    setLinkFlags(debug, config, '_32')
     
     # RELEASE 32 VARIANT
     release = env.copy()
@@ -627,6 +605,7 @@ def detect(self):
     release.set_variant('release')
     self.set_env_name('release', release)
     setEnv(release, config, optz)
+    setLinkFlags(debug, config, '_32')
     
     
     # TODO add a check to make sure the system actualy supports 64bit
@@ -648,32 +627,6 @@ def detect(self):
     setEnv(release, config, '32')
     
     
-#    variant = env.copy()
-#    if Options.options.debugging:
-#        variantName = '%s-debug' % platform
-#        setEnv(env, config, 'debug')
-#    else:
-#        variantName = '%s-release' % platform
-#        optz = 'optz_%s' % Options.options.with_optz
-#        setEnv(env, config, optz)
-#
-#    
-#    
-#    # 64/32 BIT
-#    if Options.options.enable64:
-#        variantName = '%s-64' % variantName
-#        setEnv(env, config, '64')
-#    else:
-#        setEnv(env, config, '32')
-        
-#    self.set_env_name(variantName, variant)
-#    variant.set_variant(variantName)
-#    env.set_variant(variantName)
-#    self.setenv(variantName)
-#    
-#    env['VARIANT'] = variant['VARIANT'] = variantName
-
-
 @taskgen
 @feature('untar')
 def untar(tsk):
