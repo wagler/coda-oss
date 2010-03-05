@@ -470,9 +470,9 @@ def detect(self):
         config['both']['warn']          = ''
         config['both']['verbose']       = '-v'
         config['both']['64']            = '-xtarget=generic64'
-        config['both']['linkflags_64']  = config['both']['64']
+        config['both']['linkflags_64']  = {'':config['both']['64']}
         config['both']['32']            = '-xtarget=generic'
-        config['both']['linkflags_32']  = config['both']['32']
+        config['both']['linkflags_32']  = {'':config['both']['32']}
         config['both']['optz_med']      = '-xO3'
         config['both']['optz_fast']     = '-xO4'
         config['both']['optz_fastest']  = '-fast'
