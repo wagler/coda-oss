@@ -477,9 +477,8 @@ def detect(self):
         config['both']['optz_fast']     = '-xO4'
         config['both']['optz_fastest']  = '-fast'
         
-        config['both']['flags']         = {'':'-fPIC', 'THREAD':'-mt'}
-        config['cc']['flags']           = {'':'-kPIC'}
-        config['cxx']['flags']          = {'':'-KPIC -instances=global'.split()}
+        config['both']['flags']         = {'':'-KPIC', 'THREAD':'-mt'}
+        config['cxx']['flags']          = {'':'-instances=global'.split()}
         
         config['both']['defines']       = '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE'.split()
         config['both']['linkflags_64']  = '-xtarget=generic64'
