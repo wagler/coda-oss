@@ -481,7 +481,6 @@ def detect(self):
         config['cxx']['flags']          = {'':'-instances=global'.split()}
         
         config['both']['defines']       = '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE'.split()
-        config['both']['linkflags_64']  = '-xtarget=generic64'
         config['both']['libs']          = {'DL':'dl', 'NSL':'nsl', 'SOCKET':'socket',
                                            'THREAD':'thread', 'MATH':'m',
                                            'CRUN':'Crun', 'CSTD':'Cstd'}
