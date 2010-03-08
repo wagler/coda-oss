@@ -489,40 +489,22 @@ def detect(self):
         env['shlib_CCFLAGS']            = ['-KPIC', '-DPIC']
 
     elif re.match(winRegex, platform):
-        ################################
-        # TODO
-        ################################
-        env.append_value('LIB_RPC', 'rpcrt4')
-        env.append_value('LIB_SOCKET', 'Ws2_32')
+        config['both']['debug']          = '/Zi /MTd'.split()
+        config['both']['warn']           = '/Wall'
+        config['both']['nowarn']         = '/W3 /wd4290'.split()
+        config['both']['verbose']        = ''
+        config['both']['64']             = ''
+        config['both']['optz_med']       = '-O2 /MT'.split()
+        config['both']['optz_fast']      = '-O2 /MT'.split()
+        config['both']['optz_fastest']   = '-Ox /MT'.split()
         
-        vars = {}
-        vars['debug']          = '/Zi /MTd'.split()
-        vars['warn']           = '/Wall'
-        vars['nowarn']         = '/W3 /wd4290'.split()
-        vars['verbose']        = ''
-        vars['64']             = ''
-        vars['optz_med']       = '-O2 /MT'.split()
-        vars['optz_fast']      = '-O2 /MT'.split()
-        vars['optz_fastest']   = '-Ox /MT'.split()
+        config['both']['libs']          = {'RPC':'rpcrt4', 'SOCKET':'Ws2_32'}
+        config['both']['flags']         = {'':'/UUNICODE /U_UNICODE /EHs /GR'.split(), 'THREAD':'/D_REENTRANT'}
+        config['both']['defines']       = '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE WIN32'.split()
         
         # choose the runtime to link against
         # [/MD /MDd /MT /MTd]
         
-        config['cxx'].update(vars)
-        config['cc'].update(vars)
-
-        defines = '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE WIN32'.split()
-        flags = '/UUNICODE /U_UNICODE /EHs /GR'.split()
-        threadFlags = '/D_REENTRANT'
-        
-        env.append_value('CXXDEFINES', defines)
-        env.append_value('CXXFLAGS', flags)
-        env.append_value('CXXFLAGS_THREAD', threadFlags)
-        
-        env.append_value('CCDEFINES', defines)
-        env.append_value('CCFLAGS', flags)
-        env.append_value('CCFLAGS_THREAD', threadFlags)
-    
     else:
         self.fatal('OS/platform currently unsupported: %s' % platform)
     
