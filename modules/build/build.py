@@ -428,6 +428,7 @@ def detect(self):
     winRegex = r'win32'
     
     config = {'cxx':{}, 'cc':{}, 'both':{}}
+    is64Bit = False
 
     #apple
     if re.match(appleRegex, platform):
@@ -467,19 +468,27 @@ def detect(self):
     
     #Solaris
     elif re.match(sparcRegex, platform):
+
+        #check for the prpoer 64-bit flags
+        if self.check_cxx(cxxflags='-xarch=sparc -m64 -errwarn'.split(), linkflags='-xarch=sparc -m64 -errwarn'.split(), mandatory=False, msg="Checking for -m64 compiler flag"):
+            config['both']['64'] = '-xarch=sparc -m64'.split()
+            config['both']['32'] = '-xarch=sparc -m32'.split()
+            is64Bit = True
+        elif self.check_cxx(cxxflags='-xtarget=generic64', linkflags='-xtarget=generic64', mandatory=False):
+            config['both']['64'] = '-xtarget=generic64' 
+            config['both']['32'] = '-xtarget=generic' 
+            is64Bit = True
         
         config['both']['debug']         = '-g'
         config['both']['warn']          = ''
         config['both']['verbose']       = '-v'
-        config['both']['64']            = '-xtarget=generic64'
-        config['both']['linkflags_64']  = {'':config['both']['64']}
-        config['both']['32']            = '-xtarget=generic'
-        config['both']['linkflags_32']  = {'':config['both']['32']}
         config['both']['optz_med']      = '-xO3'
         config['both']['optz_fast']     = '-xO4'
         config['both']['optz_fastest']  = '-fast'
+        config['both']['linkflags_64'] = {'':config['both'].get('64', '')}
+        config['both']['linkflags_32'] = {'':config['both'].get('32', '')}
         
-        config['both']['flags']         = {'':'-KPIC', 'THREAD':'-mt'}
+        config['both']['flags']         = {'':'-KPIC'.split(), 'THREAD':'-mt'}
         config['cxx']['flags']          = {'':'-instances=global'.split()}
         
         config['both']['defines']       = '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE'.split()
@@ -574,11 +583,11 @@ def detect(self):
         setEnv(env, config, 'verbose')
     
     #check if the system is 64-bit capable
-    is64Bit = False
-    flags64 = config['both'].get('64', config['cxx'].get('64', None))
-    linkFlags64 = config['both'].get('linkflags_64', config['cxx'].get('linkflags_64', {})).get('', None)
-    if flags64:
-        is64Bit = self.check_cxx(cxxflags=flags64, linkflags=linkFlags64, mandatory=False)
+    if not is64Bit:
+        flags64 = config['both'].get('64', config['cxx'].get('64', None))
+        linkFlags64 = config['both'].get('linkflags_64', config['cxx'].get('linkflags_64', {})).get('', None)
+        if flags64:
+            is64Bit = self.check_cxx(cxxflags=flags64, linkflags=linkFlags64, mandatory=False)
     
     defVariant = Options.options._defVariant
     if not defVariant:
