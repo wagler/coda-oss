@@ -156,9 +156,11 @@ class CPPBuildContext(BuildContext):
         if not bld.is_install:
             variants = Options.options.variants and Options.options.variants[1:] or []
             for i, v in enumerate(variants):
-#                variant = '%s-%s' % (bld.env['PLATFORM'], v)
-                for obj in [] + bld.all_task_gen:
-                    obj.clone(v)
+                for j in range(len(bld.task_manager.groups)):
+                    g = bld.task_manager.groups[j]
+                    bld.add_group()
+                    for obj in [] + g.tasks_gen:
+                        obj.clone(v)
 
 
 class GlobDirectoryWalker:
