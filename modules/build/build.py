@@ -262,10 +262,12 @@ def set_options(opt):
     ### CONFIGURE OPTIONS
     opt.add_option('--enable-warnings', action='store_true', dest='warnings',
                    help='Enable warnings (configure option)')
-#    opt.add_option('--enable-debugging', action='store_true', dest='debugging',
-#                   help='Enable debugging')
+    opt.add_option('--enable-debugging', action='store_true', dest='debugging',
+                   help='Enable debugging')
 #    opt.add_option('--enable-64bit', action='store_true', dest='enable64',
 #                   help='Enable 64bit builds')
+#    opt.add_option('--enable-32bit', action='store_true', dest='enable32',
+#                   help='Enable 32bit builds')
     opt.add_option('--with-cflags', action='store', nargs=1, dest='cflags',
                    help='Set non-standard CFLAGS (configure option)', metavar='FLAGS')
     opt.add_option('--with-cxxflags', action='store', nargs=1, dest='cxxflags',
@@ -274,7 +276,7 @@ def set_options(opt):
                    help='Use DEFS as macro definitions (configure option)', metavar='DEFS')
     opt.add_option('--default-variant', action='store', nargs=1, dest='_defVariant',
                    help='Specify the default variant to build if none are specified at build time (configure option)',
-                   metavar='VARIANT', default='release')
+                   metavar='VARIANT')
     opt.add_option('--with-optz', action='store',
                    choices=['med', 'fast', 'fastest'],
                    default='fastest', metavar='OPTZ',
@@ -413,8 +415,6 @@ def detect(self):
     env['PLATFORM'] = platform
     
     env['LIB_TYPE'] = Options.options.shared_libs and 'shlib' or 'staticlib'
-    
-    env['DEFAULT_VARIANT'] = Options.options._defVariant
     
     env.append_unique('CXXFLAGS', Options.options.cxxflags or '')
     env.append_unique('CCFLAGS', Options.options.cflags or '')
@@ -573,6 +573,20 @@ def detect(self):
     if Options.options.verbose:
         setEnv(env, config, 'verbose')
     
+    #check if the system is 64-bit capable
+    is64Bit = False
+    flags64 = config['both'].get('64', config['cxx'].get('64', None))
+    linkFlags64 = config['both'].get('linkflags_64', config['cxx'].get('linkflags_64', {})).get('', None)
+    if flags64:
+        is64Bit = self.check_cxx(cxxflags=flags64, linkflags=linkFlags64, mandatory=False)
+    
+    defVariant = Options.options._defVariant
+    if not defVariant:
+        if Options.options.debugging:
+            defVariant = 'debug%s' % (is64Bit and '64' or '')
+        else:
+            defVariant = 'release%s' % (is64Bit and '64' or '')
+    env['DEFAULT_VARIANT'] = defVariant
     
     # DEBUG 32 VARIANT
     debug = env.copy()
@@ -587,28 +601,28 @@ def detect(self):
     self.set_env_name('release', release)
     setEnv(release, config, optz)
     
-    
-    # TODO add a check to make sure the system actualy supports 64bit
-    
-    # DEBUG 64 VARIANT
-    debug64 = debug.copy()
-    debug64.set_variant('debug64')
-    self.set_env_name('debug64', debug64)
-    setEnv(debug64, config, '64')
-    
-    # RELEASE 64 VARIANT
-    release64 = release.copy()
-    release64.set_variant('release64')
-    self.set_env_name('release64', release64)
-    setEnv(release64, config, '64')
+    if is64Bit:
+        # DEBUG 64 VARIANT
+        debug64 = debug.copy()
+        debug64.set_variant('debug64')
+        self.set_env_name('debug64', debug64)
+        
+        # RELEASE 64 VARIANT
+        release64 = release.copy()
+        release64.set_variant('release64')
+        self.set_env_name('release64', release64)
+        
+        # set the debug/release 64 flags
+        setEnv(debug64, config, '64')
+        setEnv(release64, config, '64')
+        setLinkFlags(debug64, config, '_64')
+        setLinkFlags(release64, config, '_64')
     
     # now, set the debug/release 32 flags
     setEnv(debug, config, '32')
     setEnv(release, config, '32')
     setLinkFlags(debug, config, '_32')
     setLinkFlags(release, config, '_32')
-    setLinkFlags(debug64, config, '_64')
-    setLinkFlags(release64, config, '_64')
     
     
 @taskgen
