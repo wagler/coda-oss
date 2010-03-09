@@ -16,9 +16,14 @@ class CPPBuildContext(BuildContext):
     def load_envs(self):
         # override load_envs so we know when to set the default variants
         BuildContext.load_envs(self)
-        if not Options.options.variants:
-            Options.options.variants = self.env['DEFAULT_VARIANTS']
-        
+        variants = Options.options.variants
+        if not variants:
+            variants = self.env['DEFAULT_VARIANTS']
+        elif len(variants) == 1 and variants[0].lower() == 'all':
+            variants = self.all_envs.keys()
+        #filter out default
+        Options.options.variants = filter(lambda x: x != 'default', variants)
+            
     def safeVersion(self, version):
         return re.sub(r'[^\w]', '.', version)
     
@@ -311,7 +316,7 @@ def set_options(opt):
     opt.add_option('--variants', '--variant', action='callback',
                    dest='variants', type='str',
                    metavar='VARIANTS', help='Specify the build variant(s) (build option) ' \
-                        '[debug, debug64, release, release64]',
+                        '[all, debug, debug64, release, release64]',
                    callback=splitVariants)
     
 
