@@ -12,7 +12,13 @@ class CPPBuildContext(BuildContext):
     """
     def __init__(self):
         BuildContext.__init__(self)
-    
+        
+    def load_envs(self):
+        # override load_envs so we know when to set the default variants
+        BuildContext.load_envs(self)
+        if not Options.options.variants:
+            Options.options.variants = self.env['DEFAULT_VARIANTS']
+        
     def safeVersion(self, version):
         return re.sub(r'[^\w]', '.', version)
     
@@ -23,7 +29,7 @@ class CPPBuildContext(BuildContext):
         """
         
         bld = self
-        variant = Options.options.variants and Options.options.variants[0] or bld.env['DEFAULT_VARIANT']
+        variant = Options.options.variants[0]
         env = bld.env_of_name(variant)
         env.set_variant(variant)
     
@@ -90,7 +96,7 @@ class CPPBuildContext(BuildContext):
         plugin (via the plugin kwarg).
         """
         bld = self
-        variant = Options.options.variants and Options.options.variants[0] or bld.env['DEFAULT_VARIANT']
+        variant = Options.options.variants[0]
         env = bld.env_of_name(variant)
         env.set_variant(variant)
         
@@ -118,10 +124,10 @@ class CPPBuildContext(BuildContext):
     
     def program(self, **modArgs):
         """
-        Builds a program (exe)
+        Builds a program (exe)defVariants
         """
         bld = self
-        variant = Options.options.variants and Options.options.variants[0] or bld.env['DEFAULT_VARIANT']
+        variant = Options.options.variants[0]
         env = bld.env_of_name(variant)
         env.set_variant(variant)
         
@@ -262,21 +268,30 @@ def set_options(opt):
     ### CONFIGURE OPTIONS
     opt.add_option('--enable-warnings', action='store_true', dest='warnings',
                    help='Enable warnings (configure option)')
+    
+    # the following three options are here for backwards compatibility
+    # we recommend using the --default-variant option
     opt.add_option('--enable-debugging', action='store_true', dest='debugging',
                    help='Enable debugging')
-#    opt.add_option('--enable-64bit', action='store_true', dest='enable64',
-#                   help='Enable 64bit builds')
-#    opt.add_option('--enable-32bit', action='store_true', dest='enable32',
-#                   help='Enable 32bit builds')
+    opt.add_option('--enable-64bit', action='store_true', dest='enable64', default=False,
+                   help='Sets the default variant to be 64bit (deprecated - do not use)')
+    opt.add_option('--enable-32bit', action='store_true', dest='enable32', default=False,
+                   help='Sets the default variant to be 32bit')
+    
     opt.add_option('--with-cflags', action='store', nargs=1, dest='cflags',
                    help='Set non-standard CFLAGS (configure option)', metavar='FLAGS')
     opt.add_option('--with-cxxflags', action='store', nargs=1, dest='cxxflags',
                    help='Set non-standard CXXFLAGS (C++) (configure option)', metavar='FLAGS')
     opt.add_option('--with-defs', action='store', nargs=1, dest='_defs',
                    help='Use DEFS as macro definitions (configure option)', metavar='DEFS')
-    opt.add_option('--default-variant', action='store', nargs=1, dest='_defVariant',
+    
+    def splitVariants(option, opt_str, value, parser):
+        setattr(parser.values, option.dest, value.split(','))
+    
+    opt.add_option('--default-variants', '--default-variant', action='callback',
+                   type='str', dest='_defVariants',
                    help='Specify the default variant to build if none are specified at build time (configure option)',
-                   metavar='VARIANT')
+                   callback=splitVariants, metavar='VARIANTS')
     opt.add_option('--with-optz', action='store',
                    choices=['med', 'fast', 'fastest'],
                    default='fastest', metavar='OPTZ',
@@ -293,12 +308,10 @@ def set_options(opt):
     opt.add_option('--disable-symlinks', action='store_false', dest='symlinks',
                    default=True, help='Disable creating symlinks for libs (build option)')
     
-    def splitVariants(option, opt_str, value, parser):
-        setattr(parser.values, option.dest, value.split(','))
-    
     opt.add_option('--variants', '--variant', action='callback',
                    dest='variants', type='str',
-                   metavar='VARIANTS', help='Specify the build variant(s) (build option)',
+                   metavar='VARIANTS', help='Specify the build variant(s) (build option) ' \
+                        '[debug, debug64, release, release64]',
                    callback=splitVariants)
     
 
@@ -589,19 +602,24 @@ def detect(self):
         if flags64:
             is64Bit = self.check_cxx(cxxflags=flags64, linkflags=linkFlags64, mandatory=False)
     
-    defVariant = Options.options._defVariant
-    if not defVariant:
+    defaultVariants = Options.options._defVariants
+    if not defaultVariants:
+        #see if they added some options
+        default64 = is64Bit and not Options.options.enable32
         if Options.options.debugging:
-            defVariant = 'debug%s' % (is64Bit and '64' or '')
+            defaultVariants = ('debug%s' % (default64 and '64' or ''),)
         else:
-            defVariant = 'release%s' % (is64Bit and '64' or '')
-    env['DEFAULT_VARIANT'] = defVariant
+            defaultVariants = ('release%s' % (default64 and '64' or ''),)
+    
+    # keep track of which variants we are supporting
+    variants = []
     
     # DEBUG 32 VARIANT
     debug = env.copy()
     debug.set_variant('debug')
     self.set_env_name('debug', debug)
     setEnv(debug, config, 'debug')
+    variants.append('debug')
     
     # RELEASE 32 VARIANT
     release = env.copy()
@@ -609,17 +627,20 @@ def detect(self):
     release.set_variant('release')
     self.set_env_name('release', release)
     setEnv(release, config, optz)
+    variants.append('release')
     
     if is64Bit:
         # DEBUG 64 VARIANT
         debug64 = debug.copy()
         debug64.set_variant('debug64')
         self.set_env_name('debug64', debug64)
+        variants.append('debug64')
         
         # RELEASE 64 VARIANT
         release64 = release.copy()
         release64.set_variant('release64')
         self.set_env_name('release64', release64)
+        variants.append('release64')
         
         # set the debug/release 64 flags
         setEnv(debug64, config, '64')
@@ -632,6 +653,10 @@ def detect(self):
     setEnv(release, config, '32')
     setLinkFlags(debug, config, '_32')
     setLinkFlags(release, config, '_32')
+    
+    if len(defaultVariants) == 1 and defaultVariants[0].lower() == 'all':
+        defaultVariants = tuple(variants)
+    env['DEFAULT_VARIANTS'] = defaultVariants
     
     
 @taskgen
