@@ -27,6 +27,10 @@ class CPPBuildContext(BuildContext):
     def safeVersion(self, version):
         return re.sub(r'[^\w]', '.', version)
     
+    def getVariantEnv(self):
+        return self.env_of_name(Options.options.variants[0])
+    variantEnv = property(getVariantEnv)
+    
     def module(self, **modArgs):
         """
         Builds a module, along with optional tests.
@@ -34,9 +38,7 @@ class CPPBuildContext(BuildContext):
         """
         
         bld = self
-        variant = Options.options.variants[0]
-        env = bld.env_of_name(variant)
-        env.set_variant(variant)
+        env = bld.variantEnv
     
         modArgs = dict((k.lower(), v) for k, v in modArgs.iteritems())
         lang = modArgs.get('lang', 'c++')
@@ -101,9 +103,7 @@ class CPPBuildContext(BuildContext):
         plugin (via the plugin kwarg).
         """
         bld = self
-        variant = Options.options.variants[0]
-        env = bld.env_of_name(variant)
-        env.set_variant(variant)
+        env = bld.variantEnv
         
         modArgs = dict((k.lower(), v) for k, v in modArgs.iteritems())
         libName = '%s-c++' % modArgs['name']
@@ -132,9 +132,7 @@ class CPPBuildContext(BuildContext):
         Builds a program (exe)defVariants
         """
         bld = self
-        variant = Options.options.variants[0]
-        env = bld.env_of_name(variant)
-        env.set_variant(variant)
+        env = bld.variantEnv
         
         modArgs = dict((k.lower(), v) for k, v in modArgs.iteritems())
         progName = modArgs['name']

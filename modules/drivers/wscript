@@ -178,11 +178,7 @@ Utils.g_module.build_context = Utils.g_module.install_context = \
     Utils.g_module.clean_context = CPPBuildContext
 
 def build(bld):
-#    variant = bld.env['VARIANT']
-    variant = Options.options.variants and Options.options.variants[0] or bld.env['DEFAULT_VARIANT']
-#    variant = '%s-%s' % (bld.env['PLATFORM'], variant)
-    env = bld.env_of_name(variant)
-    env.set_variant(variant)
+    env = bld.variantEnv
 
     defs = env['defines']
     defList = []
