@@ -1,0 +1,12 @@
+NAME            = 'j2k'
+MAINTAINER      = 'christophercoy@users.sourceforge.net'
+VERSION         = '1.0'
+MODULE_DEPS     = 'io mt'
+USELIB_CHECK    = 'J2K'
+TEST_FILTER     = ''
+TEST_DEPS       = 'io mt cli'
+
+options = configure = distclean = lambda p: None
+
+def build(bld):
+    bld.module(**globals())
