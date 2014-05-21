@@ -23,10 +23,10 @@
 #ifndef __XML_LITE_XML_READER_H__
 #define __XML_LITE_XML_READER_H__
 
-#include "xml/lite/xml_lite_config.h"
+#include <xml/lite/xml_lite_config.h>
 
 #if defined(USE_XERCES)
-#  include "xml/lite/XMLReaderXerces.h"
+#  include <xml/lite/XMLReaderXerces.h>
 namespace xml
 {
 namespace lite
@@ -37,7 +37,7 @@ typedef XMLReaderXerces XMLReader;
 
 }
 #elif defined(USE_LIBXML)
-#  include "xml/lite/XMLReaderLibXML.h"
+#  include <xml/lite/XMLReaderLibXML.h>
 namespace xml
 {
 namespace lite
@@ -46,7 +46,7 @@ typedef XMLReaderLibXML XMLReader;
 }
 }
 #elif defined(USE_EXPAT)
-#  include "xml/lite/XMLReaderExpat.h"
+#  include <xml/lite/XMLReaderExpat.h>
 namespace xml
 {
 namespace lite
