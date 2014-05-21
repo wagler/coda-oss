@@ -612,6 +612,8 @@ class CPPContext(Context.Context):
                 mex.source = path.ant_glob(modArgs.get('source_dir', modArgs.get('sourcedir', 'source')) + '/*')
                 mex.source = filter(partial(lambda x, t: basename(str(t)) not in x, modArgs.get('source_filter', '').split()), lib.source)            
             pattern = env['%s_PATTERN' % (env['LIB_TYPE'] or 'staticlib')]
+            
+        #self.undefine('HAVE_MEX_H')
 
 class GlobDirectoryWalker:
     """ recursively walk a directory, matching filenames """
@@ -1058,99 +1060,42 @@ int main() {
     
     self.env['VARIANT'] = variant['VARIANT'] = variantName
 
-def configureFunctionsAndTypes(self):
-    # Look for a ton of headers
-    # TODO: Some of these can likely be removed
-    self.check_cc(header_name="inttypes.h", mandatory=False)
-    self.check_cc(header_name="unistd.h", mandatory=False)
-    self.check_cc(header_name="getopt.h", mandatory=False)
-    self.check_cc(header_name="malloc.h", mandatory=False)
-    self.check_cc(header_name="sys/time.h", mandatory=False)
-    self.check_cc(header_name="limits.h", mandatory=False)
-    self.check_cc(header_name="dlfcn.h", mandatory=False)
-    self.check_cc(header_name="fcntl.h", mandatory=False)
-    self.check_cc(header_name="check.h", mandatory=False)
-    self.check_cc(header_name="memory.h", mandatory=False)
-    self.check_cc(header_name="strings.h", mandatory=False)
-    self.check_cc(header_name="stdbool.h", mandatory=False)
-    self.check_cc(function_name='localtime_r', header_name="time.h", mandatory=False)
-    self.check_cc(function_name='gmtime_r', header_name="time.h", mandatory=False)
-    self.check_cc(function_name='mmap', header_name="sys/mman.h", mandatory=False)
-    self.check_cc(function_name='strerror', header_name="string.h", mandatory=False)
-    self.check_cc(function_name='bcopy', header_name="strings.h", mandatory=False)
-    self.check_cc(type_name='ssize_t', header_name='sys/types.h', mandatory=False)
-    self.check_cc(lib="m", mandatory=False, uselib_store='MATH')
-    self.check_cc(lib="rt", mandatory=False, uselib_store='RT')
-    self.check_cc(lib="sqrt", mandatory=False, uselib_store='SQRT')
-    self.check_cc(function_name='erf', header_name="math.h", use = "MATH", mandatory=False)
-    self.check_cc(function_name='erff', header_name="math.h", use = "MATH", mandatory=False)
-    self.check_cc(function_name='setenv', header_name="stdlib.h", mandatory=False)
+def writeConfig(conf, callback, guardTag, infile=None, outfile=None, path=None, feature=None, substDict=None):
+    if path is None:
+        path = join('include', guardTag.replace('.', '/'))
+    if outfile is None:
+        outfile = guardTag.replace('.', '_')
+        outfile += '_config.h'
+    if feature is None:
+        path = join(path,'%s'%outfile)
     
-    self.check_cc(function_name='gettimeofday', header_name='sys/time.h', mandatory=False)
-    if self.check_cc(lib='rt', function_name='clock_gettime', header_name='time.h', mandatory=False):
-        self.env.DEFINES.append('USE_CLOCK_GETTIME')
-    self.check_cc(function_name='BSDgettimeofday', header_name='sys/time.h', mandatory=False)
-    self.check_cc(function_name='gethrtime', header_name='sys/time.h', mandatory=False)
-    self.check_cc(function_name='getpagesize', header_name='unistd.h', mandatory=False)
-    self.check_cc(function_name='getopt', header_name='unistd.h', mandatory=False)
-    self.check_cc(function_name='getopt_long', header_name='getopt.h', mandatory=False)
+    conf.setenv('%s_config_env'%guardTag, conf.env.derive())
+    conf.env['define_key'] = []
+    callback(conf)
     
-    self.check_cc(fragment='#include <math.h>\nint main(){if (!isnan(3.14159)) isnan(2.7183);}',
-            define_name='HAVE_ISNAN', msg='Checking for function isnan',
-            errmsg='not found', mandatory=False)
-    
-    # Check for hrtime_t data type; some systems (AIX) seem to have
-    # a function called gethrtime but no hrtime_t!
-    frag = '''
-    #ifdef HAVE_SYS_TIME_H
-    #include <sys/time.h>
-    int main(){hrtime_t foobar;}
-    #endif
-    '''
-    self.check_cc(fragment=frag, define_name='HAVE_HRTIME_T',
-            msg='Checking for type hrtime_t', errmsg='not found', mandatory=False)
-    
-    types_str = '''
-#include <stdio.h>
-int isBigEndian()
-{
-    long one = 1;
-    return !(*((char *)(&one)));
-}
-int main()
-{
-    if (isBigEndian()) printf("bigendian=True\\n");
-    else printf("bigendian=False\\n");
-    printf("sizeof_int=%d\\n", sizeof(int));
-    printf("sizeof_short=%d\\n", sizeof(short));
-    printf("sizeof_long=%d\\n", sizeof(long));
-    printf("sizeof_long_long=%d\\n", sizeof(long long));
-    printf("sizeof_float=%d\\n", sizeof(float));
-    printf("sizeof_double=%d\\n", sizeof(double));
-    printf("sizeof_size_t=%d\\n", sizeof(size_t));
-    printf("sizeof_wchar_t=%d\\n", sizeof(wchar_t));
-    return 0;
-}
-'''
-    
-    #find out the size of some types, etc.
-    # TODO: This is not using the 32 vs. 64 bit linker flags, so if you're
-    #    building with --enable-32bit on 64 bit Linux, sizeof(size_t) will
-    #    erroneously be 8 here.
-    output = self.check(fragment=types_str, execute=1, msg='Checking system type sizes', define_ret=True)
-    t = Utils.str_to_dict(output or '')
-    for k, v in t.iteritems():
-        try:
-         v = int(v)
-        except:
-         v = v.strip()
-         if v == 'True':
-             v = True
-         elif v == 'False':
-             v = False
-        #v = eval(v)
-        self.msg(k.replace('_', ' ', 1), str(v))
-        self.define(k.upper(), v)
+    if feature is None:
+        conf.write_config_header(configfile=path, guard='_%s_CONFIG_H_'%guardTag.upper().replace('.', '_'), 
+                                 top=False, env=None, defines=True, headers=False, remove=True)
+    else:
+        d, u = {}, []
+        for line in conf.env['DEFINES']:
+            split = line.split('=')
+            k = split[0]
+            v = len(split) == 2 and split[1] or ' '
+            if v:
+                d[k] = v
+            else:
+                u.append(k)
+        if feature is 'handleDefs':
+            handleDefsFile(input=infile, output=outfile, path=path, defs=d, conf=conf)
+        elif feature is 'makeHeader':
+            makeHeaderFile(conf=conf, output=outfile, path=path, defs=d, undefs=u, chmod=None,
+                           guard='_%s_CONFIG_H_'%guardTag.upper().replace('.', '_'))
+        elif feature is 'm4subst':
+            m4substFile(conf, input=infile, output=outfile, path=path, 
+                        dict=substDict, env=conf.env.derive(), chmod=None)
+            
+    conf.setenv('')
 
 def configure(self):
     
@@ -1234,7 +1179,7 @@ def configure(self):
         env.append_unique('DEFINES', Options.options._defs.split(','))
 
     configureCompilerOptions(self)
-    configureFunctionsAndTypes(self)
+    #configureFunctionsAndTypes(self)
 
     env['PLATFORM'] = sys_platform
     
@@ -1367,14 +1312,18 @@ def no_implib(tsk):
 def m4subst(tsk):
     m4substFile(input=tsk.input, output=tsk.output, path=tsk.path, dict=tsk.dict, env=tsk.env, chmod=getattr(tsk, 'chmod', None))
 
-def m4substFile(input, output, path, dict={}, env=None, chmod=None):
+def m4substFile(conf, input, output, path, dict={}, env=None, chmod=None):
     import re
     #similar to the subst in misc.py - but outputs to the src directory
     m4_re = re.compile('@(\w+)@', re.M)
 
     infile = join(path.abspath(), input)
-    outfile = join(path.abspath(), output)
     
+    dir = join(conf.bldnode.abspath(), path.relpath())
+    outfile = join(dir, output)
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+        
     file = open(infile, 'r')
     code = file.read()
     file.close()
@@ -1399,11 +1348,17 @@ def m4substFile(input, output, path, dict={}, env=None, chmod=None):
 def handleDefs(tsk):
     handleDefsFile(input=tsk.input, output=tsk.output, path=tsk.path, defs=tsk.defs, chmod=getattr(tsk, 'chmod', None))
 
-def handleDefsFile(input, output, path, defs, chmod=None):
+def handleDefsFile(input, output, path, defs, chmod=None, conf=None):
     import re
     infile = join(path.abspath(), input)
-    outfile = join(path.abspath(), output)
-    
+    if conf is None:
+        outfile = join(path.abspath(), output)
+    else:
+        dir = join(conf.bldnode.abspath(), path.relpath())
+        outfile = join(dir, output)
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+
     file = open(infile, 'r')
     code = file.read()
     file.close()
@@ -1427,8 +1382,11 @@ def makeHeader(tsk):
                    chmod=getattr(tsk, 'chmod', None),
                    guard=getattr(tsk, 'guard', '__CONFIG_H__'))
     
-def makeHeaderFile(output, path, defs, undefs, chmod, guard):
-    outfile = join(path.abspath(), output)
+def makeHeaderFile(conf, output, path, defs, undefs, chmod, guard):
+    dir = join(conf.bldnode.abspath(), path.relpath())
+    outfile = join(dir, output)
+    if not os.path.exists(dir):
+        os.makedirs(dir)
     dest = open(outfile, 'w')
     dest.write('#ifndef %s\n#define %s\n\n' % (guard, guard))
 
