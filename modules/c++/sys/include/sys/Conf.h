@@ -19,10 +19,11 @@
  * see <http://www.gnu.org/licenses/>.
  *
  */
-
-
+ 
 #ifndef __SYS_CONF_H__
 #define __SYS_CONF_H__
+
+#include "sys/sys_config.h"
 
 #if defined (__APPLE_CC__)
 #  include <iosfwd>
@@ -45,9 +46,7 @@
 #include "str/Format.h"
 #include "sys/TimeStamp.h"
 
-#ifdef HAVE_CONFIG_H
-#  include "sys/config.h"
-#endif
+
 
 /*  Dance around the compiler to figure out  */
 /*  if we have access to function macro...   */

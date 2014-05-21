@@ -20,6 +20,8 @@
  *
  */
 
+#include "sys/sys_config.h"
+
 #include "except/Exception.h"
 #include "sys/DateTime.h"
 #include "sys/Conf.h"
