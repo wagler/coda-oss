@@ -12,13 +12,13 @@ from waflib import Options
 from build import writeConfig
 
 def configure(conf):
-    # callback function to check for all #defines used by the xml.lite module
+    # callback function to check for #defines used by the xml.lite module
     def xml_lite_callback(conf):
-        if Options.options.xml_layer is 'expat':
+        if Options.options.xml_layer == 'expat':
             conf.define('USE_EXPAT', '', quote=False)
-        elif Options.options.xml_layer is 'libxml':
+        elif Options.options.xml_layer == 'libxml':
             conf.define('USE_LIBXML', '', quote=False)
-        elif Options.options.xml_layer is 'xerces':
+        elif Options.options.xml_layer == 'xerces':
             conf.define('USE_XERCES', '', quote=False)
         
     writeConfig(conf, xml_lite_callback, NAME)

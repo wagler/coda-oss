@@ -55,7 +55,8 @@ typedef ValidatorExpat Validator;
 }
 }
 #else
-#  #error XML parser must be set at configure time
+  #error XML parser must be set at configure time
 #endif
 
 #endif
+
