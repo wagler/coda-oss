@@ -58,13 +58,17 @@ def configure(conf):
             def jpeg_callback(conf):
                 # These are needed by jmorecfg.h.  We could just set these defines
                 # rather than bothering with the conf check.
+                conf.define('HAVE_PROTOTYPES', 1)
                 conf.check_cc(fragment='int main(){unsigned short; return 0;}',
                     define_name='HAVE_UNSIGNED_SHORT', msg='Checking for unsigned short', 
                     mandatory=False)
                 conf.check_cc(fragment='int main(){unsigned char i; return 0;}',
                     define_name='HAVE_UNSIGNED_CHAR', msg='Checking for unsigned char', 
                     mandatory=False)
-            
+                conf.check_cc(header_name="stddef.h", mandatory=False)
+                conf.check_cc(header_name="stdlib.h", mandatory=False)
+                conf.check_cc(header_name="locale.h", mandatory=False)
+                
             conf.env['MAKE_JPEG'] = True
             conf.msg('Building local lib', 'jpeg (libjpeg)')
             
