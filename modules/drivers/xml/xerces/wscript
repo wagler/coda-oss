@@ -224,24 +224,7 @@ def configure(conf):
                           infile='Xerces_autoconf_config.hpp.in',
                           outfile='Xerces_autoconf_config.hpp',
                           path=xercesNode, feature='handleDefs')
-            '''
-            if not Options.options.shared_libs:
-                print conf.bldnode.abspath()
-                print conf.path.relpath()
-                #print xercesNode.path.abspath()
-                path = join(conf.bldnode.abspath(), conf.path.relpath(), SOURCE, 'src', 'xercesc', 'util', 'Xerces_autoconf_config.hpp')
-                print path
-                #readFile = open(path)
-                #lines = readFile.readlines()
-                #readFile.close()
-                
-                file = open(path, "a+")
-                #file.writelines([item for item in lines[:-1]])
-                file.write('\n#ifndef XERCESC_STATIC_LIBRARY')
-                file.write('\n#define XERCESC_STATIC_LIBRARY')
-                file.write('\n#endif')
-                file.close()
-            '''   
+  
         # use an already built version that's on the system
         else :
             # if test fails then fail the configure
