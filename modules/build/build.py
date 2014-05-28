@@ -575,8 +575,8 @@ class CPPContext(Context.Context):
             variant = modArgs.get('variant', bld.env['VARIANT'] or 'default')
             env = bld.all_envs[variant]
         
-        if self.is_defined('HAVE_MEX_H'):
-        
+        if 'HAVE_MEX_H' in self.env['HAVE_MATLAB']:
+            
             modArgs = dict((k.lower(), v) for k, v in modArgs.iteritems())
             lang = modArgs.get('lang', 'c++')
             libExeType = {'c++':'cxx', 'c':'c'}.get(lang, 'cxx')
@@ -613,8 +613,6 @@ class CPPContext(Context.Context):
                 mex.source = filter(partial(lambda x, t: basename(str(t)) not in x, modArgs.get('source_filter', '').split()), lib.source)            
             pattern = env['%s_PATTERN' % (env['LIB_TYPE'] or 'staticlib')]
             
-        #self.undefine('HAVE_MEX_H')
-
 class GlobDirectoryWalker:
     """ recursively walk a directory, matching filenames """
     def __init__(self, directory, patterns=["*"]):

@@ -83,10 +83,12 @@ def configure(self):
         try:
             env = self.env.derive()
             
-            self.check(header_name='mex.h', define_name='HAVE_MEX_H',
-                       includes=incDirs, uselib_store='MEX', uselib='MEX',
-                       mandatory=True, env=env)
-            
+            if self.check(header_name='mex.h', define_name='HAVE_MEX_H',
+                    includes=incDirs, uselib_store='MEX', uselib='MEX',
+                    mandatory=True, env=env):
+                        self.env.append_value('HAVE_MATLAB', 'HAVE_MEX_H')
+                        self.undefine('HAVE_MEX_H')
+                        
             libPrefix = ''
             if re.match(winRegex, self.env['PLATFORM']):
                 libPrefix = 'lib'
