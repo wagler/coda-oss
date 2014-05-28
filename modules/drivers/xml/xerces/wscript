@@ -43,6 +43,7 @@ def configure(conf):
             
             # callback function to check for all #defines used by the xerces driver
             def xerces_callback(conf):   
+                conf.check_cc(header_name="inttypes.h", mandatory=False)
                 conf.check_cc(header_name="netinet/in.h", mandatory=False)
                 conf.check_cc(header_name="arpa/inet.h", mandatory=False)
                 conf.check_cc(header_name="netdb.h", mandatory=False)
@@ -302,7 +303,7 @@ def build(bld):
                      defines=xercesDefines)
         if libType == 'stlib':
             xerces.export_defines='XERCES_STATIC_LIBRARY'
-                
+        
         if env['install_libs']:
             xerces.install_path = env['install_libdir']
 
