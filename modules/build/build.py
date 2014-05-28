@@ -1317,7 +1317,7 @@ def m4substFile(conf, input, output, path, dict={}, env=None, chmod=None):
 
     infile = join(path.abspath(), input)
     
-    dir = join(conf.bldnode.abspath(), path.relpath())
+    dir = join(conf.env['BUILD_PATH'], path.relpath())
     outfile = join(dir, output)
     if not os.path.exists(dir):
         os.makedirs(dir)
@@ -1352,7 +1352,7 @@ def handleDefsFile(input, output, path, defs, chmod=None, conf=None):
     if conf is None:
         outfile = join(path.abspath(), output)
     else:
-        dir = join(conf.bldnode.abspath(), path.relpath())
+        dir = join(conf.env['BUILD_PATH'], path.relpath())
         outfile = join(dir, output)
         if not os.path.exists(dir):
             os.makedirs(dir)
@@ -1381,7 +1381,7 @@ def makeHeader(tsk):
                    guard=getattr(tsk, 'guard', '__CONFIG_H__'))
     
 def makeHeaderFile(conf, output, path, defs, undefs, chmod, guard):
-    dir = join(conf.bldnode.abspath(), path.relpath())
+    dir = join(conf.env['BUILD_PATH'], path.relpath())    
     outfile = join(dir, output)
     if not os.path.exists(dir):
         os.makedirs(dir)
