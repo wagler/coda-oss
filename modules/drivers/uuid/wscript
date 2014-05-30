@@ -38,7 +38,8 @@ def configure(conf):
                 conf.fatal('Missing uuid tarfile')
             
             def uuid_callback(conf):
-                return
+                conf.check_cc(header_name="inttypes.h", mandatory=False)
+                
             types_str = '''
                 #include <stdio.h>
                 int isBigEndian()
