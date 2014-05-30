@@ -38,8 +38,10 @@ def configure(conf):
                 conf.fatal('Missing uuid tarfile')
             
             def uuid_callback(conf):
-                conf.check_cc(header_name="inttypes.h", mandatory=False)
+                return
                 
+            conf.check_cc(header_name="inttypes.h", mandatory=False)
+            
             types_str = '''
                 #include <stdio.h>
                 int isBigEndian()
@@ -81,8 +83,6 @@ def configure(conf):
             
             fname='e2fsprogs-1.40-uuid'
             driverNode = conf.path.make_node(join(fname, 'lib', 'uuid'))
-            
-            
             
             writeConfig(conf, uuid_callback, 'uuid', infile='uuid_types.h.in',
                         outfile='uuid_types.h', path = driverNode, 
