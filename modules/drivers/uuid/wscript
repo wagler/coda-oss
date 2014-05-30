@@ -1,7 +1,8 @@
 import os
-from waflib import Options
+from os.path import join, exists
+from waflib import Options, Utils
 from waflib.TaskGen import feature, before, task_gen
-from build import untarFile
+from build import untarFile, writeConfig
 
 def options(opt):
     if Options.platform != 'win32':
@@ -35,12 +36,57 @@ def configure(conf):
             # Build is off by default when tarfile not found, fail if forced on
             if not os.path.exists(os.path.join(conf.path.abspath(), 'e2fsprogs-1.40-uuid.tar')):
                 conf.fatal('Missing uuid tarfile')
-
+            
+            def uuid_callback(conf):
+                return
+            types_str = '''
+                #include <stdio.h>
+                int isBigEndian()
+                {
+                    long one = 1;
+                    return !(*((char *)(&one)));
+                }
+                int main()
+                {
+                    if (isBigEndian()) printf("bigendian=True\\n");
+                    else printf("bigendian=False\\n");
+                    printf("sizeof_int=%d\\n", sizeof(int));
+                    printf("sizeof_short=%d\\n", sizeof(short));
+                    printf("sizeof_long=%d\\n", sizeof(long));
+                    printf("sizeof_long_long=%d\\n", sizeof(long long));
+                    return 0;
+                }
+                '''
+            #find out the size of some types, etc.
+            # TODO: This is not using the 32 vs. 64 bit linker flags, so if you're
+            #    building with --enable-32bit on 64 bit Linux, sizeof(size_t) will
+            #    erroneously be 8 here.
+            output = conf.check(fragment=types_str, execute=1, msg='Checking system type sizes', define_ret=True)
+            f = Utils.to_list(output.upper() or '')
+            d, u = {}, []
+            for line in f:
+                split = line.split('=')
+                k = split[0]
+                v = len(split) == 2 and split[1] or ' '
+                if v:
+                    d[k] = v
+                else:
+                    u.append(k)
+                        
             conf.env['MAKE_UUID'] = True
             conf.msg('Building local lib', 'uuid')
            
             untarFile(path=conf.path, fname='e2fsprogs-1.40-uuid.tar')
-
+            
+            fname='e2fsprogs-1.40-uuid'
+            driverNode = conf.path.make_node(join(fname, 'lib', 'uuid'))
+            
+            
+            
+            writeConfig(conf, uuid_callback, 'uuid', infile='uuid_types.h.in',
+                        outfile='uuid_types.h', path = driverNode, 
+                        feature='m4subst', substDict=d)
+            
         else:
             conf.check(lib='uuid', uselib_store='UUID',
                        header_name='uuid/uuid.h', function_name='uuid_generate',
@@ -69,12 +115,6 @@ def build(bld):
             if v:
                 d[k] = v
         
-        uuidH = bld(input='lib/uuid/uuid_types.h.in',
-                                 output='lib/uuid/uuid_types.h',
-                                 dict=d, path=driverNode,
-                                 env=env.derive())
-        uuidH.features = ['m4subst']
-    
         sources = map(lambda x: 'lib/uuid/%s' % x,
                     'clear.c compare.c copy.c gen_uuid.c isnull.c pack.c parse.c ' \
                       'unpack.c unparse.c uuid_time.c'.split())
@@ -84,8 +124,7 @@ def build(bld):
                                 includes='lib',
                                 target='uuid',
                                 name='UUID', path=driverNode,
-                                env=env.derive(), defines=env['DEFINES'],
-                                targets_to_add=[uuidH])
+                                env=env.derive(), defines=env['DEFINES'])
         if env['install_libs']:
             uuid.install_path = env['install_libdir']
         
@@ -96,7 +135,7 @@ def build(bld):
                 dir=includeNode,
                 files=['uuid.h'],
                 name='UUID_HEADERS_INSTALL')
-            uuid.targets_to_add += ['UUID_HEADERS_INSTALL']
+            uuid.targets_to_add = ['UUID_HEADERS_INSTALL']
 
         if env['install_source']:
             sourceFiles += [fname + '.tar']

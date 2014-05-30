@@ -133,8 +133,7 @@ def configure(conf):
                             v = True
                         elif v == 'False':
                             v = False
-                conf.msg(k.replace('_', ' ', 1), str(v))
-                conf.define(k.upper(), v)
+                    conf.define(k.upper(), v)
                 
                 
             defs = {}
