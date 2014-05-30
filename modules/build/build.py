@@ -1071,9 +1071,13 @@ def writeConfig(conf, callback, guardTag, infile=None, outfile=None, path=None, 
     conf.env['define_key'] = []
     callback(conf)
     
+    bldpath = conf.env['BUILD_PATH']
+    
     if feature is None:
-        conf.write_config_header(configfile=path, guard='_%s_CONFIG_H_'%guardTag.upper().replace('.', '_'), 
-                                 top=False, env=None, defines=True, headers=False, remove=True)
+        conf.write_config_header(configfile=path, 
+                                 guard='_%s_CONFIG_H_'%guardTag.upper().replace('.', '_'), 
+                                 top=False, env=None, defines=True, 
+                                 headers=False, remove=True)
     else:
         d, u = {}, []
         for line in conf.env['DEFINES']:
@@ -1087,10 +1091,10 @@ def writeConfig(conf, callback, guardTag, infile=None, outfile=None, path=None, 
         if feature is 'handleDefs':
             handleDefsFile(input=infile, output=outfile, path=path, defs=d, conf=conf)
         elif feature is 'makeHeader':
-            makeHeaderFile(conf=conf, output=outfile, path=path, defs=d, undefs=u, chmod=None,
+            makeHeaderFile(bldpath, output=outfile, path=path, defs=d, undefs=u, chmod=None,
                            guard='_%s_CONFIG_H_'%guardTag.upper().replace('.', '_'))
         elif feature is 'm4subst':
-            m4substFile(conf, input=infile, output=outfile, path=path, 
+            m4substFile(input=infile, output=outfile, path=path, 
                         dict=substDict, env=conf.env.derive(), chmod=None)
             
     conf.setenv('')
@@ -1310,15 +1314,19 @@ def no_implib(tsk):
 def m4subst(tsk):
     m4substFile(input=tsk.input, output=tsk.output, path=tsk.path, dict=tsk.dict, env=tsk.env, chmod=getattr(tsk, 'chmod', None))
 
-def m4substFile(conf, input, output, path, dict={}, env=None, chmod=None):
+def m4substFile(input, output, path, dict={}, env=None, chmod=None):
     import re
     #similar to the subst in misc.py - but outputs to the src directory
     m4_re = re.compile('@(\w+)@', re.M)
 
     infile = join(path.abspath(), input)
     
-    dir = join(conf.env['BUILD_PATH'], path.relpath())
+    if env is None:
+        dir = path.relpath()
+    else:
+        dir = join(env['BUILD_PATH'], path.relpath())
     outfile = join(dir, output)
+    
     if not os.path.exists(dir):
         os.makedirs(dir)
         
@@ -1352,7 +1360,10 @@ def handleDefsFile(input, output, path, defs, chmod=None, conf=None):
     if conf is None:
         outfile = join(path.abspath(), output)
     else:
-        dir = join(conf.env['BUILD_PATH'], path.relpath())
+        if conf is None:
+            dir = path.relpath()
+        else:
+            dir = join(conf.env['BUILD_PATH'], path.relpath())
         outfile = join(dir, output)
         if not os.path.exists(dir):
             os.makedirs(dir)
@@ -1380,8 +1391,8 @@ def makeHeader(tsk):
                    chmod=getattr(tsk, 'chmod', None),
                    guard=getattr(tsk, 'guard', '__CONFIG_H__'))
     
-def makeHeaderFile(conf, output, path, defs, undefs, chmod, guard):
-    dir = join(conf.env['BUILD_PATH'], path.relpath())    
+def makeHeaderFile(bldpath, output, path, defs, undefs, chmod, guard):
+    dir = join(bldpath, path.relpath())    
     outfile = join(dir, output)
     if not os.path.exists(dir):
         os.makedirs(dir)
