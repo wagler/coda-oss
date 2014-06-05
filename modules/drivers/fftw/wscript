@@ -135,7 +135,6 @@ def configure(conf):
                             v = False
                     conf.define(k.upper(), v)
                 
-                
             defs = {}
 
             conf.env['MAKE_FFT'] = True
