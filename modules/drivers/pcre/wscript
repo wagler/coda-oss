@@ -1,6 +1,6 @@
 import os
-from os.path import join
-from waflib import Options, Utils
+from os.path import join, split
+from waflib import Options, Utils, Context
 from waflib.TaskGen import feature, before, task_gen
 from build import untarFile
 
@@ -136,7 +136,7 @@ def build(bld):
                          use='chartables.c',
                          targets_to_add=[],
                          defines=env['DEFINES'])
-                         
+
         pcre.includes = Utils.to_list(pcre.includes)
         pcre.includes.append(pcre.path.relpath())
         pcre.export_includes = Utils.to_list(pcre.export_includes)
@@ -151,18 +151,24 @@ def build(bld):
 
         if env['install_headers']:
             bld(features='install_tgt', install_path=env['install_includedir'],
-                dir=driverNode, files=['pcreposix.h'], 
-                name='PCRE_POSIX_INSTALL')
-            
+                dir=driverNode, files=['pcre.h', 'pcreposix.h'], 
+                name='PCRE_HEADERS_INSTALL')
+            '''
             installDir = join(bld.bldnode.abspath(), pcre.path.relpath())
-            pcreHnode = bld.path.make_node(installDir)
-            
-            bld(features='install_tgt', install_path=env['install_includedir'],
-                dir=pcreHnode, 
-                files=['pcre.h'], 
-                name='PCRE_HEADER_INSTALL')
-            
-            pcre.targets_to_add += ['PCRE_POSIX_INSTALL', 'PCRE_HEADER_INSTALL']
+            print '--from'
+            print driverNode.abspath()
+            print '--to'
+            print installDir
+            dir = bld.root.find_dir(installDir).path_from(driverNode)
+            print '--use'
+            print dir
+            pcreHnode = bld.path.make_node(join(fname, str(dir)))
+            print '--result'
+            print pcreHnode.abspath()
+            print '----'
+            pcreHnode.sig = Utils.h_file(join(pcreHnode.abspath()))
+            '''
+            pcre.targets_to_add += ['PCRE_HEADERS_INSTALL']
 
         if env['install_source']:
             sourceFiles += [fname + '.tar']
