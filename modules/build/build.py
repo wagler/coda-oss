@@ -1365,7 +1365,7 @@ def handleDefsFile(input, output, path, defs, chmod=None, conf=None):
         if conf is None:
             dir = path.relpath()
         else:
-            dir = join(conf.env['BUILD_PATH'], path.relpath())
+            dir = join(str(conf.env['BUILD_PATH']), path.relpath())
         outfile = join(dir, output)
         if not os.path.exists(dir):
             os.makedirs(dir)
@@ -1394,7 +1394,7 @@ def makeHeader(tsk):
                    guard=getattr(tsk, 'guard', '__CONFIG_H__'))
     
 def makeHeaderFile(bldpath, output, path, defs, undefs, chmod, guard):
-    dir = join(bldpath, path.relpath())    
+    dir = join(str(bldpath), path.relpath())    
     outfile = join(dir, output)
     if not os.path.exists(dir):
         os.makedirs(dir)
