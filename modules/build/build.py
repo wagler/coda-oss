@@ -1320,11 +1320,13 @@ def m4substFile(input, output, path, dict={}, env=None, chmod=None):
     m4_re = re.compile('@(\w+)@', re.M)
 
     infile = join(path.abspath(), input)
-    
+    '''
     if env is None:
         dir = path.relpath()
     else:
         dir = join(env['BUILD_PATH'], path.relpath())
+    '''
+    dir = path.relpath()
     outfile = join(dir, output)
     
     if not os.path.exists(dir):
