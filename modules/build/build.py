@@ -1359,6 +1359,7 @@ def handleDefs(tsk):
 def handleDefsFile(input, output, path, defs, chmod=None, conf=None):
     import re
     infile = join(path.abspath(), input)
+    '''
     if conf is None:
         outfile = join(path.abspath(), output)
     else:
@@ -1369,7 +1370,9 @@ def handleDefsFile(input, output, path, defs, chmod=None, conf=None):
         outfile = join(dir, output)
         if not os.path.exists(dir):
             os.makedirs(dir)
-
+    '''
+    outfile = join(path.abspath(), output)
+    
     file = open(infile, 'r')
     code = file.read()
     file.close()
@@ -1394,10 +1397,10 @@ def makeHeader(tsk):
                    guard=getattr(tsk, 'guard', '__CONFIG_H__'))
     
 def makeHeaderFile(bldpath, output, path, defs, undefs, chmod, guard):
-    dir = join(str(bldpath), path.relpath())    
-    outfile = join(dir, output)
-    if not os.path.exists(dir):
-        os.makedirs(dir)
+    #dir = join(str(bldpath), path.relpath())    
+    outfile = join(path.abspath(), output)
+    #if not os.path.exists(dir):
+    #    os.makedirs(dir)
     dest = open(outfile, 'w')
     dest.write('#ifndef %s\n#define %s\n\n' % (guard, guard))
 
