@@ -26,6 +26,8 @@ def options(opt):
 from build import writeConfig
 
 def configure(conf):
+    conf.env['BUILD_PATH'] = conf.bldnode.abspath()
+    
     #-- FFT --------------------------------------------------------------------
     if Options.options.enable_fft:
         fftHome = Options.options.fft_home
