@@ -167,7 +167,7 @@ def build(bld):
             print '--result'
             print pcreHnode.abspath()
             print '----'
-            pcreHnode.sig = Utils.h_file(join(pcreHnode.abspath()))
+            #pcreHnode.sig = Utils.h_file(join(pcreHnode.abspath()))
             '''
             pcre.targets_to_add += ['PCRE_HEADERS_INSTALL']
 
