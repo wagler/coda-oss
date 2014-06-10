@@ -344,7 +344,25 @@ class CPPContext(Context.Context):
             lib.targets_to_add.append(bld(features='install_tgt', pattern='**/*',
                                           dir=path.make_node('include'),
                                           install_path=env['install_includedir']))
-
+            
+            confTag = Utils.split_path(path.abspath())
+            installPath = confTag[len(confTag)-1].replace('.', '/')
+            index = confTag[len(confTag)-1]
+            
+            d = {}
+            for line in env['header_builddir']:
+                split = line.split('=')
+                k = split[0]
+                v = join(env['BUILD_PATH'], split[1])
+                d[k] = v
+            
+            if index in d:
+                dir1 = bld.root.find_dir(d[index]).path_from(path)
+                dirNode = bld.path.make_node(dir1)
+                lib.targets_to_add.append(bld(features='install_tgt', pattern='*.h',
+                                          dir=dirNode,
+                                          install_path=join(env['install_includedir'], installPath)))
+            
         addSourceTargets(bld, env, path, lib)
 
         testNode = path.make_node('tests')
@@ -1061,6 +1079,8 @@ int main() {
 def writeConfig(conf, callback, guardTag, infile=None, outfile=None, path=None, feature=None, substDict=None):
     if path is None:
         path = join('include', guardTag.replace('.', '/'))
+        tempPath = join(str(conf.path.relpath()), path)
+        conf.env.append_value('header_builddir', guardTag + '=' + tempPath)
     if outfile is None:
         outfile = guardTag.replace('.', '_')
         outfile += '_config.h'
