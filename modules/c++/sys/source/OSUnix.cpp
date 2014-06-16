@@ -239,6 +239,36 @@ size_t sys::OSUnix::getNumCPUs() const
 #endif
 }
 
+void sys::OSUnix::createSymlink(const std::string& origPathname, 
+                                const std::string& symlinkPathname) const
+{
+    if(symlink(origPathname.c_str(), symlinkPathname.c_str()))
+    {
+        throw sys::SystemException(Ctxt(
+                "Symlink creation has failed"));
+    }
+}
+
+size_t sysconfCaller(int name)
+{
+    long long returnVal = sysconf(name);
+    if(returnVal == -1){
+        throw sys::SystemException(Ctxt(
+                "Call to sysconf() has failed"));
+    }
+    return returnVal;
+}
+
+void sys::OSUnix::getMemInfo(size_t &totalPhysMem, size_t &freePhysMem) const
+{
+    long long pageSize = sysconfCaller(_SC_PAGESIZE);
+    long long totalNumPages = sysconfCaller(_SC_PHYS_PAGES);
+    long long availNumPages = sysconfCaller(_SC_AVPHYS_PAGES);
+
+    totalPhysMem = (pageSize*totalNumPages/1024)/1024;
+    freePhysMem = (pageSize*availNumPages/1024)/1024;
+}
+
 void sys::DirectoryUnix::close()
 {
     if (mDir)

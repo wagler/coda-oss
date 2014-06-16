@@ -27,6 +27,7 @@
 #include "sys/OSWin32.h"
 #include "sys/File.h"
 
+#include <iostream>
 
 std::string sys::OSWin32::getPlatformName() const
 {
@@ -44,7 +45,7 @@ std::string sys::OSWin32::getPlatformName() const
     {
         platform = "Windows on Win32 95";
     }
-    else if (info.dwPlatformId = VER_PLATFORM_WIN32_NT)
+    else if (info.dwPlatformId == VER_PLATFORM_WIN32_NT)
     {
         platform = "Windows on Win32 NT";
     }
@@ -238,6 +239,55 @@ size_t sys::OSWin32::getNumCPUs() const
     SYSTEM_INFO info;
     GetSystemInfo(&info);
     return info.dwNumberOfProcessors;
+}
+
+void sys::OSWin32::createSymlink(const std::string& origPathname, 
+                                 const std::string& symlinkPathname) const
+{
+    OSVERSIONINFO vi;
+    memset(&vi, 0, sizeof(vi));
+    vi.dwOSVersionInfoSize = sizeof(vi);
+    if(!GetVersionEx(&vi))
+    {
+        throw sys::SystemException(Ctxt(
+            "Call to GetVersionEx() has failed"));
+    }
+
+    // Symlinks were not available on versions of windows prior to Windows Vista
+    if(vi.dwPlatformId == VER_PLATFORM_WIN32_NT  &&  vi.dwMajorVersion >= 6)
+    {
+        if(!CreateSymbolicLink(const_cast<char*>(symlinkPathname.c_str()), 
+                               const_cast<char*>(origPathname.c_str()), true))
+        {
+            throw sys::SystemException(Ctxt(
+                "Call to CreateSymbolicLink() has failed"));
+        }
+    }
+    else
+    {
+        throw sys::SystemException(Ctxt(
+            "Windows version does not support symlinks"));
+    }
+}
+
+void sys::OSWin32::getMemInfo(size_t& totalPhysMem, size_t& freePhysMem) const
+{
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    if(GlobalMemoryStatusEx(&memInfo))
+    {
+        totalPhysMem = memInfo.ullTotalPhys;
+        freePhysMem = memInfo.ullAvailPhys;
+
+        // convert to megabytes
+        totalPhysMem /= (1024*1024);
+        freePhysMem /= (1024*1024);
+    }
+    else
+    {
+        throw sys::SystemException(Ctxt(
+            "Call to GlobalMemoryStatusEx() has failed"));
+    }
 }
 
 void sys::DirectoryWin32::close()
