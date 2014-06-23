@@ -346,7 +346,7 @@ class CPPContext(Context.Context):
                                           install_path=env['install_includedir']))
             
             confTag = Utils.split_path(path.abspath())
-            installPath = confTag[len(confTag)-1].replace('.', '/')
+            installPath = confTag[len(confTag)-1].replace('.', os.sep)
             index = confTag[len(confTag)-1]
             
             d = {}
@@ -355,11 +355,12 @@ class CPPContext(Context.Context):
                 k = split[0]
                 v = join(env['BUILD_PATH'], split[1])
                 d[k] = v
-            
+                
             if index in d:
+                configFilename = index.replace('.', '_') + '_config.h'
                 dir1 = bld.root.find_dir(d[index]).path_from(path)
                 dirNode = bld.path.make_node(dir1)
-                lib.targets_to_add.append(bld(features='install_tgt', pattern='*.h',
+                lib.targets_to_add.append(bld(features='install_tgt', files=[configFilename],
                                           dir=dirNode,
                                           install_path=join(env['install_includedir'], installPath)))
             
@@ -1078,7 +1079,7 @@ int main() {
 
 def writeConfig(conf, callback, guardTag, infile=None, outfile=None, path=None, feature=None, substDict=None):
     if path is None:
-        path = join('include', guardTag.replace('.', '/'))
+        path = join('include', guardTag.replace('.', os.sep))
         tempPath = join(str(conf.path.relpath()), path)
         conf.env.append_value('header_builddir', guardTag + '=' + tempPath)
     if outfile is None:
