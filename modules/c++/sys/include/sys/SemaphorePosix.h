@@ -23,7 +23,7 @@
 
 #ifndef __SYS_SEMAPHORE_POSIX_H__
 #define __SYS_SEMAPHORE_POSIX_H__
-#if defined(__POSIX) && defined(_REENTRANT) && !defined(__APPLE_CC__)
+#if defined(__POSIX) && !defined(__APPLE_CC__)
 
 #include "sys/SemaphoreInterface.h"
 

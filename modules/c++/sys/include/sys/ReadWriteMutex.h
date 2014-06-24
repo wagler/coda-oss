@@ -26,7 +26,7 @@
 
 
 
-#if defined(_REENTRANT) && !defined(__APPLE_CC__)
+#if !defined(__APPLE_CC__)
 
 #include "sys/Dbg.h"
 #include "sys/Mutex.h"

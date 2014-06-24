@@ -23,7 +23,7 @@
 
 #include "sys/ThreadPosix.h"
 
-#if defined(__POSIX) && defined(_REENTRANT)
+#if defined(__POSIX)
 
 #ifdef WIN32
 #   define SIGKILL 0

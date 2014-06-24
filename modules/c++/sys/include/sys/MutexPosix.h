@@ -24,7 +24,7 @@
 #ifndef __SYS_MUTEX_POSIX_H__
 #define __SYS_MUTEX_POSIX_H__
 
-#if defined(__POSIX) && defined(_REENTRANT)
+#if defined(__POSIX)
 #include "sys/MutexInterface.h"
 #include <pthread.h>
 

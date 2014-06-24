@@ -24,7 +24,7 @@
 #ifndef __SYS_THREAD_PTHREAD_CONDITION_VARIABLE_H__
 #define __SYS_THREAD_PTHREAD_CONDITION_VARIABLE_H__
 
-#if defined(__POSIX) && defined(_REENTRANT)
+#if defined(__POSIX)
 
 #include "sys/MutexPosix.h"
 #include "sys/ConditionVarInterface.h"

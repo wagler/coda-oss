@@ -21,7 +21,7 @@
  */
 
 
-#if defined(__POSIX) && defined(_REENTRANT)
+#if defined(__POSIX)
 #include <pthread.h>
 #include "sys/ConditionVarPosix.h"
 

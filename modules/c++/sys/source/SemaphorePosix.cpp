@@ -21,7 +21,7 @@
  */
 
 
-#if defined(__POSIX) && defined(_REENTRANT) && !defined(__APPLE_CC__)
+#if defined(__POSIX) && !defined(__APPLE_CC__)
 #include <semaphore.h>
 #include "sys/SemaphorePosix.h"
 

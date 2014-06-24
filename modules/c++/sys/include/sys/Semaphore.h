@@ -33,7 +33,6 @@
  *  because that is how it determines reentrance!
  *
  */
-#  if defined(_REENTRANT)
 
 #    if defined(USE_NSPR_THREADS)
 #        include "sys/SemaphoreNSPR.h"
@@ -75,7 +74,5 @@ namespace sys
 typedef SemaphorePosix Semaphore;
 }
 #    endif // Which thread package?
-
-#  endif // Are we reentrant?
 
 #endif // End of header

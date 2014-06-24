@@ -21,7 +21,7 @@
  */
 
 
-#  if defined(__sgi) && defined(_REENTRANT) && !defined(__POSIX)
+#  if defined(__sgi) && !defined(__POSIX)
 #include <ulocks.h>
 
 #include "sys/SyncFactoryIrix.h"

@@ -24,7 +24,7 @@
 #ifndef __SYS_SEMAPHORE_POSIX_H__
 #define __SYS_SEMAPHORE_POSIX_H__
 
-#if defined(__sun) && defined(_REENTRANT) && !defined(__POSIX)
+#if defined(__sun) && !defined(__POSIX)
 #include <synch.h>
 #include "sys/SemaphoreInterface.h"
 

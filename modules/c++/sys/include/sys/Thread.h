@@ -34,7 +34,6 @@
  *  because that is how it determines reentrance!
  *
  */
-#  if defined(_REENTRANT)
 
 // Netscape portable runtime
 #    if defined(USE_NSPR_THREADS)
@@ -76,7 +75,5 @@ namespace sys
 typedef ThreadPosix Thread;
 }
 #    endif // Which thread package?
-
-#  endif // Are we reentrant?
 
 #endif
