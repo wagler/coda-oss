@@ -803,8 +803,7 @@ def configureCompilerOptions(self):
     if re.match(appleRegex, sys_platform):
         self.env.append_value('LIB_DL', 'dl')
         self.env.append_value('LIB_NSL', 'nsl')
-        self.env.append_value('LIB_THREAD', 'pthread')
-        self.env.append_value('DEFINES_THREAD', '_REENTRANT')
+        self.env.append_value('LINKFLAG_THREAD', 'pthread')
         self.check_cc(lib='pthread', mandatory=True)
 
         config['cxx']['debug']          = '-g'
@@ -835,8 +834,7 @@ def configureCompilerOptions(self):
     elif re.match(linuxRegex, sys_platform):
         self.env.append_value('LIB_DL', 'dl')
         self.env.append_value('LIB_NSL', 'nsl')
-        self.env.append_value('LIB_THREAD', 'pthread')
-        self.env.append_value('DEFINES_THREAD', '_REENTRANT')
+        self.env.append_value('LINKFLAG', 'pthread')
         self.env.append_value('LIB_MATH', 'm')
 
         self.check_cc(lib='pthread', mandatory=True)
@@ -893,7 +891,6 @@ def configureCompilerOptions(self):
         self.env.append_value('LIB_CRUN', 'Crun')
         self.env.append_value('LIB_CSTD', 'Cstd')
         self.check_cc(lib='thread', mandatory=True)
-        self.check_cc(header_name="atomic.h", mandatory=False)
         
         warningFlags = ''
         if Options.options.warningsAsErrors:
