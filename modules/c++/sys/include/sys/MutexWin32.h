@@ -25,7 +25,7 @@
 #define __SYS_MUTEX_WIN32_H__
 
 #if defined(WIN32)
-#if !defined(USE_NSPR_THREADS) && !defined(__POSIX)
+#if !defined(USE_NSPR_THREADS)
 
 #include "sys/MutexInterface.h"
 

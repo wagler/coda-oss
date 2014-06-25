@@ -24,7 +24,6 @@
 #ifndef __SYS_CONDITION_VAR_H__
 #define __SYS_CONDITION_VAR_H__
 
-
 #    if defined(USE_NSPR_THREADS)
 #        include "sys/ConditionVarNSPR.h"
 namespace sys
@@ -37,19 +36,20 @@ namespace sys
 {
 typedef ConditionVarWin32 ConditionVar;
 }
-#    elif defined(__sun) && !defined(__POSIX)
+#    elif defined(__sun)
 #        include "sys/ConditionVarSolaris.h"
 namespace sys
 {
 typedef ConditionVarSolaris ConditionVar;
 }
-#    elif defined(__sgi) && !defined(__POSIX)
+#    elif defined(__sgi)
 #        include "sys/ConditionVarIrix.h"
 namespace sys
 {
 typedef ConditionVarIrix ConditionVar;
 }
-#    else //default to POSIX
+//default to POSIX
+#    else
 #        include "sys/ConditionVarPosix.h"
 namespace sys
 {

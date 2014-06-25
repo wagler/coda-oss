@@ -21,7 +21,7 @@
  */
 
 
-#if defined(__sgi) && !defined(__POSIX)
+#if defined(__sgi)
 #include <ulocks.h>
 #include "sys/SemaphoreIrix.h"
 
@@ -60,5 +60,5 @@ usema_t*& sys::SemaphoreIrix::getNative()
     return (usema_t*) NULL;
 }
 
-#endif // __sgi && !__POSIX
+#endif // __sgi
 

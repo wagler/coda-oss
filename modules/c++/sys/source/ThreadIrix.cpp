@@ -21,7 +21,7 @@
  */
 
 
-#if defined(__sgi) && !defined(__POSIX)
+#if defined(__sgi)
 #include "sys/ThreadIrix.h"
 
 // void sys::ThreadIrix::start()

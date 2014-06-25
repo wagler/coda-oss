@@ -21,7 +21,7 @@
  */
 
 
-#if defined(__sun) && !defined(__POSIX)
+#if defined(__sun)
 #include "sys/ThreadSolaris.h"
 #include "sys/Dbg.h"
 

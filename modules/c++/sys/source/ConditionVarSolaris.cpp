@@ -21,7 +21,7 @@
  */
 
 
-#if defined(__sun) && !defined(__POSIX)
+#if defined(__sun)
 #include <thread.h>
 #include <synch.h>
 #include "sys/ConditionVarSolaris.h"
