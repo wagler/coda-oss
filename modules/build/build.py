@@ -827,16 +827,15 @@ def configureCompilerOptions(self):
         config['cc']['optz_fast']      = config['cxx']['optz_fast']
         config['cc']['optz_fastest']   = config['cxx']['optz_fastest']
 
-        self.env.append_value('DEFINES', '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE __POSIX'.split())
+        self.env.append_value('DEFINES', '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE'.split())
         self.env.append_value('CFLAGS', '-fPIC -dynamiclib'.split())
 
     #linux
     elif re.match(linuxRegex, sys_platform):
         self.env.append_value('LIB_DL', 'dl')
         self.env.append_value('LIB_NSL', 'nsl')
-        self.env.append_value('LINKFLAGS_THREAD', '-pthread')
         self.env.append_value('LIB_MATH', 'm')
-
+        self.env.append_value('LINKFLAGS_THREAD', '-pthread')
         self.check_cc(lib='pthread', mandatory=True)
 
         warningFlags = '-Wall'
@@ -864,7 +863,7 @@ def configureCompilerOptions(self):
             self.env.append_value('CXXFLAGS', '-fPIC')
 
             # DEFINES and LINKFLAGS will apply to both gcc and g++
-            self.env.append_value('DEFINES', '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE __POSIX'.split())
+            self.env.append_value('DEFINES', '_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE'.split())
             self.env.append_value('LINKFLAGS', '-Wl,-E -fPIC'.split())
         
         if ccCompiler == 'gcc' or ccCompiler == 'icc':
