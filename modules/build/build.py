@@ -798,6 +798,10 @@ def configureCompilerOptions(self):
         self.fatal('Unable to find C/C++ compiler')
     
     config = {'cxx':{}, 'cc':{}}
+    
+    # get the -lrt flag in the main env
+    if self.check_cc(lib='rt', uselib_store='RT', function_name='clock_gettime', header_name='time.h', mandatory=False):
+        self.undefine('HAVE_CLOCK_GETTIME')
 
     #apple
     if re.match(appleRegex, sys_platform):
