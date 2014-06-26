@@ -381,7 +381,7 @@ double sys::DateTime::toMillis(tm t) const
 
 void sys::DateTime::setNow()
 {
-#if defined(__POSIX) && defined(HAVE_CLOCK_GETTIME)
+#if defined(HAVE_PTHREAD_H) && defined(HAVE_CLOCK_GETTIME)
     struct timespec now;
     clock_gettime(CLOCK_REALTIME,&now);
     mTimeInMillis = (now.tv_sec + 1.0e-9 * now.tv_nsec) * 1000;
