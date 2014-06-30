@@ -1,8 +1,7 @@
 import os
 from waflib import Options, Utils
 from waflib.TaskGen import feature, before, task_gen
-from build import untarFile, handleDefsFile
-
+from build import untarFile, handleDefsFile, writeConfig
 
 def options(opt):
     opt.add_option('--with-fft-home', action='store', dest='fft_home',
@@ -22,8 +21,6 @@ def options(opt):
                    default=os.path.exists(os.path.join(opt.path.abspath(), 'fftw-2.1.5.tar')))
     opt.add_option('--nobuild-fft', action='store_false', dest="build_fft",
                    help='force not building FFT library (fftw) from scratch')
-
-from build import writeConfig
 
 def configure(conf):
     conf.env['BUILD_PATH'] = conf.bldnode.abspath()
@@ -54,7 +51,7 @@ def configure(conf):
                           msg='Checking for library fftw3', okmsg=fft3Home,
                           mandatory=False):
                 conf.env.append_unique('CXXDEFINES_FFT', ['HAVE_FFTW3'])
-                conf.define('HAVE_FFTW3', True)
+                conf.undefine('HAVE_FFTWF_EXECUTE')
 
         elif conf.check(lib='fftw3f', uselib_store='FFT',
                         header_name='fftw3.h',
@@ -62,7 +59,7 @@ def configure(conf):
                         msg='Checking for library fftw3',
                         mandatory=False):
             conf.env.append_unique('CXXDEFINES_FFT', ['HAVE_FFTW3'])
-            conf.define('HAVE_FFTW3', True)
+            conf.undefine('HAVE_FFTWF_EXECUTE')
 
         # FFTW2 - fallback when fftw3 not available
         elif fftHome:
