@@ -43,13 +43,14 @@ def configure(conf):
 
         jpegHome = Options.options.jpeg_home
         if jpegHome:
-            conf.check(lib='jpeg' if sys.platform != 'win32' else 'libjpeg', 
+            if conf.check(lib='jpeg' if sys.platform != 'win32' else 'libjpeg', 
                        uselib_store='JPEG', 
                        header_name='jpeglib.h', fragment=frag,
                        libpath=join(jpegHome, 'lib'),
                        includes=join(jpegHome, 'include'),
                        msg='Checking for library libjpeg', okmsg=jpegHome,
-                       mandatory=False)
+                       mandatory=False):
+                           conf.undefine('HAVE_JPEGLIB_H')
 
         elif Options.options.build_jpeg:
             # Build is off by default when tarfile not found, fail if forced on
@@ -82,11 +83,12 @@ def configure(conf):
                         outfile='jconfig.h', path=driverNode, feature='handleDefs')
             
         else:
-            conf.check(lib='jpeg' if sys.platform != 'win32' else 'libjpeg', 
+            if conf.check(lib='jpeg' if sys.platform != 'win32' else 'libjpeg', 
                        uselib_store='JPEG',
                        header_name='jpeglib.h', fragment=frag,
                        msg='Checking for library libjpeg',
-                       mandatory=False)
+                       mandatory=False):
+                           conf.undefine('HAVE_JPEGLIB_H')
 
         conf.env['HAVE_JPEG'] = True
 
@@ -127,13 +129,6 @@ def build(bld):
                       name='JPEG',
                       targets_to_add=[])
         
-        # seems to build fine whether these are present or not
-        '''
-        jpeglib.includes = Utils.to_list(jpeglib.includes)
-        jpeglib.includes.append(join(jpeglib.path.relpath()))
-        jpeglib.export_includes = Utils.to_list(jpeglib.export_includes)
-        jpeglib.export_includes.append(join(jpeglib.path.relpath()))
-        '''
         if env['install_libs']:
             jpeglib.install_path = env['install_libdir']
         

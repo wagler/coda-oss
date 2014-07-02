@@ -37,7 +37,6 @@ def configure(conf):
 
         if Options.options.fft_double:
             conf.env['MAKE_FFT_DOUBLE'] = True
-            conf.env['DEFINES'].append('ENABLE_FFT_DOUBLE=1')
         else:
             conf.env['MAKE_FFT_DOUBLE'] = False
 
@@ -50,7 +49,7 @@ def configure(conf):
                           includes=os.path.join(fft3Home, 'include'),
                           msg='Checking for library fftw3', okmsg=fft3Home,
                           mandatory=False):
-                conf.env.append_unique('CXXDEFINES_FFT', ['HAVE_FFTW3'])
+                conf.env['HAVE_FFTW3'] = True
                 conf.undefine('HAVE_FFTWF_EXECUTE')
 
         elif conf.check(lib='fftw3f', uselib_store='FFT',
@@ -58,7 +57,7 @@ def configure(conf):
                         function_name='fftwf_execute',
                         msg='Checking for library fftw3',
                         mandatory=False):
-            conf.env.append_unique('CXXDEFINES_FFT', ['HAVE_FFTW3'])
+            conf.env['HAVE_FFTW3'] = True
             conf.undefine('HAVE_FFTWF_EXECUTE')
 
         # FFTW2 - fallback when fftw3 not available
@@ -79,8 +78,10 @@ def configure(conf):
             # callback function to check for all #defines used by the fftw driver
             def fftw_callback(conf):
                 conf.define('FFTW_VERSION', '"2.1.5"', quote=False)
-                if not conf.env['MAKE_FFT_DOUBLE']:
-                    conf.define('FFTW_ENABLE_FLOAT', 1)
+                if conf.env['MAKE_FFT_DOUBLE']:
+                    conf.define('ENABLE_FFT_DOUBLE', True)
+                else:
+                    conf.define('FFTW_ENABLE_FLOAT', True)
                 conf.check_cc(header_name="unistd.h", mandatory=False)
                 conf.check_cc(header_name="getopt.h", mandatory=False)
                 conf.check_cc(header_name="malloc.h", mandatory=False)
@@ -200,13 +201,6 @@ def build(bld):
                                 name='FFT', defines=env['DEFINES'] + defs,
                                 env=env.derive(), targets_to_add=[])
         
-        # seems to build fine whether these are present or not
-        '''
-        fftw.includes = Utils.to_list(fftw.includes)
-        fftw.includes.append(fftw.path.relpath())
-        fftw.export_includes = Utils.to_list(fftw.export_includes)
-        fftw.export_includes.append(fftw.path.relpath())
-        '''
         if env['install_libs']:
             fftw.install_path = env['install_libdir']
 

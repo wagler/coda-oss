@@ -27,12 +27,13 @@ def configure(conf):
 
         pcreHome = Options.options.pcre_home
         if pcreHome:
-            conf.check(lib='pcre', uselib_store='PCRE',
+            if conf.check(lib='pcre', uselib_store='PCRE',
                        header_name='pcre.h', function_name='pcre_version',
                        libpath=os.path.join(pcreHome, 'lib'),
                        includes=os.path.join(pcreHome, 'include'),
                        msg='Checking for library pcre', okmsg=pcreHome,
-                       mandatory=False)
+                       mandatory=False):
+                           conf.undefine('HAVE_PCRE_VERSION')
 
         elif Options.options.build_pcre:
             # Build is off by default when tarfile not found, fail if forced on
@@ -81,10 +82,11 @@ def configure(conf):
                         path=driverNode, feature='m4subst', substDict=d)
             
         else:
-            conf.check(lib='pcre', uselib_store='PCRE',
+            if conf.check(lib='pcre', uselib_store='PCRE',
                        header_name='pcre.h', function_name='pcre_version',
                        msg='Checking for library pcre',
-                       mandatory=False)
+                       mandatory=False):
+                           conf.undefine('HAVE_PCRE_VERSION')
 
 def build(bld):
     variant = bld.env['VARIANT']
@@ -154,21 +156,7 @@ def build(bld):
             bld(features='install_tgt', install_path=env['install_includedir'],
                 dir=driverNode, files=['pcre.h', 'pcreposix.h'], 
                 name='PCRE_HEADERS_INSTALL')
-            '''
-            installDir = join(bld.bldnode.abspath(), pcre.path.relpath())
-            print '--from'
-            print driverNode.abspath()
-            print '--to'
-            print installDir
-            dir = bld.root.find_dir(installDir).path_from(driverNode)
-            print '--use'
-            print dir
-            pcreHnode = bld.path.make_node(join(fname, str(dir)))
-            print '--result'
-            print pcreHnode.abspath()
-            print '----'
-            #pcreHnode.sig = Utils.h_file(join(pcreHnode.abspath()))
-            '''
+
             pcre.targets_to_add += ['PCRE_HEADERS_INSTALL']
 
         if env['install_source']:

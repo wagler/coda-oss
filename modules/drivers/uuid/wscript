@@ -27,12 +27,13 @@ def configure(conf):
 
         uuidHome = Options.options.uuid_home
         if uuidHome:
-            conf.check(lib='uuid', uselib_store='UUID',
+            if conf.check(lib='uuid', uselib_store='UUID',
                        header_name='uuid/uuid.h', function_name='uuid_generate',
                        libpath=os.path.join(uuidHome, 'lib'),
                        includes=os.path.join(uuidHome, 'include'),
                        msg='Checking for library uuid', okmsg=uuidHome,
-                       mandatory=False)
+                       mandatory=False):
+                           conf.undefine('HAVE_UUID_GENERATE')
 
         elif Options.options.build_uuid:
             # Build is off by default when tarfile not found, fail if forced on
@@ -91,10 +92,11 @@ def configure(conf):
                         feature='m4subst', substDict=d)
             
         else:
-            conf.check(lib='uuid', uselib_store='UUID',
+            if conf.check(lib='uuid', uselib_store='UUID',
                        header_name='uuid/uuid.h', function_name='uuid_generate',
                        msg='Checking for library uuid',
-                       mandatory=False)
+                       mandatory=False):
+                           conf.undefine('HAVE_UUID_GENERATE')
 
 def build(bld):
     variant = bld.env['VARIANT']
