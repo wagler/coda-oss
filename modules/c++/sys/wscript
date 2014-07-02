@@ -11,6 +11,11 @@ from build import writeConfig
 from waflib import Utils
 
 def configure(conf):
+    
+    # this check defines HAVE_CLOCK_GETTIME, undefine it to keep it out of dumpenv
+    if conf.check_cc(lib='rt', uselib_store='RT', function_name='clock_gettime', header_name='time.h', mandatory=False):
+        conf.undefine('HAVE_CLOCK_GETTIME')
+    
     # callback function to check for all #defines used by the sys module
     def sys_callback(conf):
         conf.check_cc(header_name='pthread.h', mandatory=False)
