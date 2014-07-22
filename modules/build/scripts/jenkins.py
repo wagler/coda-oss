@@ -56,12 +56,12 @@ elif 'win32' in os.environ.get('JOB_NAME'):
         java_home32 = os.environ.get('JAVA_HOME_32')
         if java_home32:
             os.environ['JAVA_HOME'] = java_home32
-        config_options += ['--enable-32bit']
+    config_options += ['--enable-32bit']
 
 if '-mt' in os.environ.get('JOB_NAME'):
     config_options += ["--with-crt=MT"]
 if '-vc9' in os.environ.get('JOB_NAME'):
-    config_options += ["--msvc_version=msvc 9.0,msvc 9.0Exp"]
+    config_options += ["--msvc_version=msvc 9.0,msvc 9.0Exp,wsdk 6.1"]
 elif '-vc10' in os.environ.get('JOB_NAME'):
     config_options += ["--msvc_version=msvc 10.0,msvc 10.0Exp"]
 
