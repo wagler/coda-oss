@@ -349,6 +349,7 @@ class CPPContext(Context.Context):
                                           dir=path.make_node('include'),
                                           install_path=env['install_includedir']))
             
+            # copy config headers from target dir to install dir
             confTag = Utils.split_path(path.abspath())
             installPath = confTag[len(confTag)-1].replace('.', os.sep)
             index = confTag[len(confTag)-1]
@@ -635,7 +636,7 @@ class CPPContext(Context.Context):
                 mex.source = path.ant_glob(modArgs.get('source_dir', modArgs.get('sourcedir', 'source')) + '/*')
                 mex.source = filter(partial(lambda x, t: basename(str(t)) not in x, modArgs.get('source_filter', '').split()), lib.source)            
             pattern = env['%s_PATTERN' % (env['LIB_TYPE'] or 'staticlib')]
-            
+
 class GlobDirectoryWalker:
     """ recursively walk a directory, matching filenames """
     def __init__(self, directory, patterns=["*"]):
@@ -1206,7 +1207,6 @@ def configure(self):
         env.append_unique('DEFINES', Options.options._defs.split(','))
 
     configureCompilerOptions(self)
-    #configureFunctionsAndTypes(self)
 
     env['PLATFORM'] = sys_platform
     
@@ -1345,12 +1345,6 @@ def m4substFile(input, output, path, dict={}, env=None, chmod=None):
     m4_re = re.compile('@(\w+)@', re.M)
 
     infile = join(path.abspath(), input)
-    '''
-    if env is None:
-        dir = path.relpath()
-    else:
-        dir = join(env['BUILD_PATH'], path.relpath())
-    '''
     dir = path.relpath()
     outfile = join(dir, output)
     
@@ -1384,18 +1378,6 @@ def handleDefs(tsk):
 def handleDefsFile(input, output, path, defs, chmod=None, conf=None):
     import re
     infile = join(path.abspath(), input)
-    '''
-    if conf is None:
-        outfile = join(path.abspath(), output)
-    else:
-        if conf is None:
-            dir = path.relpath()
-        else:
-            dir = join(str(conf.env['BUILD_PATH']), path.relpath())
-        outfile = join(dir, output)
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-    '''
     outfile = join(path.abspath(), output)
     
     file = open(infile, 'r')
@@ -1422,10 +1404,7 @@ def makeHeader(tsk):
                    guard=getattr(tsk, 'guard', '__CONFIG_H__'))
     
 def makeHeaderFile(bldpath, output, path, defs, undefs, chmod, guard):
-    #dir = join(str(bldpath), path.relpath())    
     outfile = join(path.abspath(), output)
-    #if not os.path.exists(dir):
-    #    os.makedirs(dir)
     dest = open(outfile, 'w')
     dest.write('#ifndef %s\n#define %s\n\n' % (guard, guard))
 
