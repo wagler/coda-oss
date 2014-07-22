@@ -38,7 +38,6 @@ TEST_CASE(testStringStream)
     TEST_ASSERT_EQ(stream.tell(), 1);
 
     stream.seek(22, io::Seekable::CURRENT);
-    TEST_ASSERT_EQ(stream.tell(), static_cast<int>(io::InputStream::IS_END));
     stream.seek(0, io::Seekable::START);
 
     stream.reset();
