@@ -76,15 +76,12 @@ public:
         {
         case START:
             flags = std::ios::beg;
-            if(offset > mData.str().size()) mData.setstate(mData.failbit);
             break;
         case END:
             flags = std::ios::end;
-            if(offset > 0) mData.setstate(mData.failbit);
             break;
         default:
             flags = std::ios::cur;
-            if(offset > available()) mData.setstate(mData.failbit);
             break;
         }
 
