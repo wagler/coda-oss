@@ -23,7 +23,7 @@ def options(opt):
                    help='force not building FFT library (fftw) from scratch')
 
 def configure(conf):
-    conf.env['BUILD_PATH'] = conf.bldnode.abspath()
+    #conf.env['BUILD_PATH'] = conf.bldnode.abspath()
     
     #-- FFT --------------------------------------------------------------------
     if Options.options.enable_fft:

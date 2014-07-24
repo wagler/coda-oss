@@ -37,7 +37,7 @@ def options(opt):
 from build import writeConfig
 
 def configure(conf):
-    conf.env['BUILD_PATH'] = conf.bldnode.abspath()
+    #conf.env['BUILD_PATH'] = conf.bldnode.abspath()
     
     if Options.options.enable_jpeg:
 

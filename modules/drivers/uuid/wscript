@@ -20,7 +20,7 @@ def options(opt):
 
 
 def configure(conf):
-    conf.env['BUILD_PATH'] = conf.bldnode.abspath()
+    #conf.env['BUILD_PATH'] = conf.bldnode.abspath()
     
     #-- UUID -------------------------------------------------------------------
     if Options.platform != 'win32' and Options.options.enable_uuid:

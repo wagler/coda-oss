@@ -22,7 +22,7 @@ def options(opt):
     opt.recurse(existingDirs)
 
 def configure(conf):
-    conf.env['BUILD_PATH'] = conf.bldnode.abspath()
+    #conf.env['BUILD_PATH'] = conf.bldnode.abspath()
     
     if Options.options.enable_xml:
         conf.msg('Configuring with XML layer', Options.options.xml_layer)

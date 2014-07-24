@@ -20,7 +20,7 @@ def options(opt):
 from build import writeConfig
 
 def configure(conf):
-    conf.env['BUILD_PATH'] = conf.bldnode.abspath()
+    #conf.env['BUILD_PATH'] = conf.bldnode.abspath()
     
     #-- PCRE -------------------------------------------------------------------
     if Options.options.enable_pcre:
@@ -39,6 +39,8 @@ def configure(conf):
             # Build is off by default when tarfile not found, fail if forced on
             if not os.path.exists(os.path.join(conf.path.abspath(), 'pcre-5.0.tar')):
                 conf.fatal('Missing pcre tarfile')
+            
+            #pcre version variables
             
             # callback function to check for all #defines used by the pcre driver
             def pcre_callback(conf):
