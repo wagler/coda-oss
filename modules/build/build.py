@@ -350,20 +350,23 @@ class CPPContext(Context.Context):
                                           install_path=env['install_includedir']))
             
             # copy config headers from target dir to install dir
-            confTag = Utils.split_path(path.abspath())
-            installPath = confTag[len(confTag)-1].replace('.', os.sep)
-            index = confTag[len(confTag)-1]
+            installPath = modArgs['name'].replace('.', os.sep)
+            moduleName = modArgs['name']
+            
+            print 'install1 ', self.srcnode.abspath()
+            print 'install2 ', self.bldnode.abspath()
+            print 'install3 ', env['BUILD_PATH']
             
             d = {}
             for line in env['header_builddir']:
                 split = line.split('=')
                 k = split[0]
-                v = join(env['BUILD_PATH'], split[1])
+                v = join(self.bldnode.abspath(), split[1])
                 d[k] = v
                 
-            if index in d:
-                configFilename = index.replace('.', '_') + '_config.h'
-                dir1 = bld.root.find_dir(d[index]).path_from(path)
+            if moduleName in d:
+                configFilename = moduleName.replace('.', '_') + '_config.h'
+                dir1 = bld.root.find_dir(d[moduleName]).path_from(path)
                 dirNode = bld.path.make_node(dir1)
                 lib.targets_to_add.append(bld(features='install_tgt', files=[configFilename],
                                           dir=dirNode,
@@ -599,7 +602,7 @@ class CPPContext(Context.Context):
             variant = modArgs.get('variant', bld.env['VARIANT'] or 'default')
             env = bld.all_envs[variant]
         
-        if 'HAVE_MEX_H' in self.env['HAVE_MATLAB']:
+        if self.is_defined('HAVE_MATLAB'):
             
             modArgs = dict((k.lower(), v) for k, v in modArgs.iteritems())
             lang = modArgs.get('lang', 'c++')
@@ -1093,7 +1096,10 @@ def writeConfig(conf, callback, guardTag, infile=None, outfile=None, path=None, 
     conf.env['define_key'] = []
     callback(conf)
     
-    bldpath = conf.env['BUILD_PATH']
+    bldpath = conf.bldnode.abspath()
+    print 'conf1 ', conf.srcnode.abspath()
+    print 'conf2 ', conf.bldnode.abspath()
+    print 'conf3 ', conf.env['BUILD_PATH']
     
     if feature is None:
         conf.write_config_header(configfile=path, 
@@ -1106,6 +1112,7 @@ def writeConfig(conf, callback, guardTag, infile=None, outfile=None, path=None, 
             split = line.split('=')
             k = split[0]
             v = len(split) == 2 and split[1] or ' '
+            #v = split[1] if len(split) == 2 else ' '
             if v:
                 d[k] = v
             else:

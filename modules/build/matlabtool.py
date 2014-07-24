@@ -81,15 +81,14 @@ def configure(self):
         self.env.append_value('CFLAGS_MEX', '-DMATLAB_MEX_FILE'.split())
 #        self.env.append_value('LINKFLAGS_MEX', '-Wl,-rpath-link,%s' % ':'.join(libDirs))
 
-        haveMex = 'HAVE_MEX_H'
         try:
             env = self.env.derive()
             
-            if self.check(header_name='mex.h', define_name=haveMex,
+            if self.check(header_name='mex.h', define_name='HAVE_MEX_H',
                     includes=incDirs, uselib_store='MEX', uselib='MEX',
                     mandatory=True, env=env):
-                        self.env.append_value('HAVE_MATLAB', haveMex)
-                        self.undefine(haveMex)
+                        self.env['HAVE_MATLAB'] = True
+                        self.undefine('HAVE_MEX_H')
                         
             libPrefix = ''
             if re.match(winRegex, self.env['PLATFORM']):
