@@ -81,7 +81,7 @@ def configure(conf):
             
             writeConfig(conf, uuid_callback, 'uuid', infile='uuid_types.h.in',
                         outfile='uuid_types.h', path = driverNode, 
-                        feature='m4subst', substDict=d)
+                        feature='m4subst', substDict=defs)
             
         else:
             if conf.check(lib='uuid', uselib_store='UUID',
