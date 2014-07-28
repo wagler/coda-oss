@@ -19,9 +19,7 @@ def options(opt):
 
 from build import writeConfig
 
-def configure(conf):
-    #conf.env['BUILD_PATH'] = conf.bldnode.abspath()
-    
+def configure(conf):    
     #-- PCRE -------------------------------------------------------------------
     if Options.options.enable_pcre:
 
@@ -76,8 +74,8 @@ def configure(conf):
             # make config.h
             fname='pcre-5.0'
             driverNode = conf.path.make_node(fname)
-            writeConfig(conf, pcre_callback, 'pcre', infile=None, outfile='config.h', 
-                        path=driverNode, feature='makeHeader')
+            writeConfig(conf, pcre_callback, 'pcre', infile='config.in', outfile='config.h', 
+                        path=driverNode, feature='handleDefs')
             
             d = dict(PCRE_MAJOR=5, PCRE_MINOR=0, PCRE_DATE='13-Sep-2004')
             writeConfig(conf, pcre_callback, 'pcreh', infile='pcre.in', outfile='pcre.h', 

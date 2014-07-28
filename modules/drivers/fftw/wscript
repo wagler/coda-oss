@@ -22,9 +22,7 @@ def options(opt):
     opt.add_option('--nobuild-fft', action='store_false', dest="build_fft",
                    help='force not building FFT library (fftw) from scratch')
 
-def configure(conf):
-    #conf.env['BUILD_PATH'] = conf.bldnode.abspath()
-    
+def configure(conf):    
     #-- FFT --------------------------------------------------------------------
     if Options.options.enable_fft:
         fftHome = Options.options.fft_home
@@ -134,8 +132,6 @@ def configure(conf):
                         elif v == 'False':
                             v = False
                     conf.define(k.upper(), v)
-                
-            defs = {}
 
             conf.env['MAKE_FFT'] = True
             conf.env['MAKE_RFFT'] = True
@@ -144,18 +140,18 @@ def configure(conf):
                 double_fft = 'yes'
             else:
                 double_fft = 'no'
-                defs['FFTW_ENABLE_FLOAT'] = '1'
             conf.msg('Building double precision fft library', double_fft)
             
             untarFile(path=conf.path, fname='fftw-2.1.5.tar')
-            handleDefsFile(input='fftw/fftw.h.in', output='fftw/fftw.h', defs=defs,
-                              path=conf.path.make_node('fftw-2.1.5'))
             
-            # make config.h
+            # make configuration headers
             fname = 'fftw-2.1.5'
             driverNode = conf.path.make_node(fname)
-            writeConfig(conf, fftw_callback, 'fftw', infile=None, outfile='config.h', 
-                        path=driverNode, feature='makeHeader')
+            writeConfig(conf, fftw_callback, 'fftw_h', infile='fftw/fftw.h.in', outfile='fftw/fftw.h', 
+                        path=driverNode, feature='handleDefs')
+            
+            writeConfig(conf, fftw_callback, 'fftw', infile='fftw/config.h.in', outfile='fftw/config.h', 
+                        path=driverNode, feature='handleDefs')
 
         elif conf.check(lib='fftw', uselib_store='FFT',
                         header_name='fftw.h',
