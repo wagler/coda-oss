@@ -353,10 +353,6 @@ class CPPContext(Context.Context):
             installPath = modArgs['name'].replace('.', os.sep)
             moduleName = modArgs['name']
             
-            print 'install1 ', self.srcnode.abspath()
-            print 'install2 ', self.bldnode.abspath()
-            print 'install3 ', env['BUILD_PATH']
-            
             d = {}
             for line in env['header_builddir']:
                 split = line.split('=')
@@ -365,7 +361,7 @@ class CPPContext(Context.Context):
                 d[k] = v
                 
             if moduleName in d:
-                configFilename = moduleName.replace('.', '_') + '_config.h'
+                configFilename = getConfigFilename(moduleName)
                 dir1 = bld.root.find_dir(d[moduleName]).path_from(path)
                 dirNode = bld.path.make_node(dir1)
                 lib.targets_to_add.append(bld(features='install_tgt', files=[configFilename],
@@ -1081,14 +1077,33 @@ int main() {
     
     self.env['VARIANT'] = variant['VARIANT'] = variantName
 
+def getConfigFilename(moduleName):
+    return moduleName.replace('.', '_') + '_config.h'
+
+def listToTuple(defines):
+    d, u = {}, []
+    for line in defines:
+        split = line.split('=')
+        k = split[0]
+        
+        #v = len(split) == 2 and split[1] or ' '
+        v = ' '
+        if len(split) == 2:
+            v = split[1]
+        
+        if v != 0:
+            d[k] = v
+        else:
+            u.append(k)
+    return d,u
+    
 def writeConfig(conf, callback, guardTag, infile=None, outfile=None, path=None, feature=None, substDict=None):
     if path is None:
         path = join('include', guardTag.replace('.', os.sep))
         tempPath = join(str(conf.path.relpath()), path)
         conf.env.append_value('header_builddir', guardTag + '=' + tempPath)
     if outfile is None:
-        outfile = guardTag.replace('.', '_')
-        outfile += '_config.h'
+        outfile = getConfigFilename(guardTag)
     if feature is None:
         path = join(path,'%s'%outfile)
     
@@ -1097,9 +1112,6 @@ def writeConfig(conf, callback, guardTag, infile=None, outfile=None, path=None, 
     callback(conf)
     
     bldpath = conf.bldnode.abspath()
-    print 'conf1 ', conf.srcnode.abspath()
-    print 'conf2 ', conf.bldnode.abspath()
-    print 'conf3 ', conf.env['BUILD_PATH']
     
     if feature is None:
         conf.write_config_header(configfile=path, 
@@ -1107,20 +1119,14 @@ def writeConfig(conf, callback, guardTag, infile=None, outfile=None, path=None, 
                                  top=False, env=None, defines=True, 
                                  headers=False, remove=True)
     else:
-        d, u = {}, []
-        for line in conf.env['DEFINES']:
-            split = line.split('=')
-            k = split[0]
-            v = len(split) == 2 and split[1] or ' '
-            #v = split[1] if len(split) == 2 else ' '
-            if v:
-                d[k] = v
-            else:
-                u.append(k)
+        tuple = listToTuple(conf.env['DEFINES'])
+        defs = tuple[0]
+        undefs = tuple[1]
+                
         if feature is 'handleDefs':
-            handleDefsFile(input=infile, output=outfile, path=path, defs=d, conf=conf)
+            handleDefsFile(input=infile, output=outfile, path=path, defs=defs, conf=conf)
         elif feature is 'makeHeader':
-            makeHeaderFile(bldpath, output=outfile, path=path, defs=d, undefs=u, chmod=None,
+            makeHeaderFile(bldpath, output=outfile, path=path, defs=defs, undefs=undefs, chmod=None,
                            guard='_%s_CONFIG_H_'%guardTag.upper().replace('.', '_'))
         elif feature is 'm4subst':
             m4substFile(input=infile, output=outfile, path=path, 
@@ -1395,7 +1401,8 @@ def handleDefsFile(input, output, path, defs, chmod=None, conf=None):
         v = defs[k]
         if v is None:
             v = ''
-        code = re.sub(r'#undef %s(\n)' % k, r'#define %s %s\1' % (k,v), code)
+        code = re.sub(r'#undef %s' % k, r'#define %s %s' % (k,v), code)
+        code = re.sub(r'#define %s 0(\n)' % k, r'#define %s %s\1' % (k,v), code)
     code = re.sub(r'(#undef[^\n\/\**]*)(\/\*.+\*\/)?(\n)', r'/* \1 */\3', code)
     file = open(outfile, 'w')
     file.write(code)
