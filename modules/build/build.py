@@ -350,8 +350,8 @@ class CPPContext(Context.Context):
                                           install_path=env['install_includedir']))
             
             # copy config headers from target dir to install dir
-            installPath = modArgs['name'].replace('.', os.sep)
             moduleName = modArgs['name']
+            installPath = moduleName.replace('.', os.sep)
             
             d = {}
             for line in env['header_builddir']:
@@ -362,10 +362,10 @@ class CPPContext(Context.Context):
                 
             if moduleName in d:
                 configFilename = getConfigFilename(moduleName)
-                dir1 = bld.root.find_dir(d[moduleName]).path_from(path)
-                dirNode = bld.path.make_node(dir1)
+                targetPath = bld.root.find_dir(d[moduleName]).path_from(path)
+                moduleNode = bld.path.make_node(targetPath)
                 lib.targets_to_add.append(bld(features='install_tgt', files=[configFilename],
-                                          dir=dirNode,
+                                          dir=moduleNode,
                                           install_path=join(env['install_includedir'], installPath)))
             
         addSourceTargets(bld, env, path, lib)
