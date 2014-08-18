@@ -24,8 +24,8 @@
 #ifndef __MT_SINGLETON_H__
 #define __MT_SINGLETON_H__
 
-#include <import/sys.h>
-#include "mt/CriticalSection.h"
+#include <import/mt.h>
+#include <mt/CriticalSection.h>
 
 namespace mt
 {
@@ -124,7 +124,7 @@ protected:
 
 private:
     static T* mInstance; //static instance
-    static sys::Mutex mMutex; //static mutex for locking access to the instance
+    static mt::Mutex mMutex; //static mutex for locking access to the instance
     inline explicit Singleton(Singleton const&) {}
     inline Singleton& operator=(Singleton const&) { return *this; }
 };
@@ -135,7 +135,7 @@ T& Singleton<T, AutoDestroy>::getInstance()
     //double-checked locking
     if (mInstance == 0)
     {
-        CriticalSection<sys::Mutex> obtainLock(&mMutex);
+        CriticalSection<mt::Mutex> obtainLock(&mMutex);
         if (mInstance == 0)
         {
             mInstance = new T; //create the instance
@@ -151,7 +151,7 @@ void Singleton<T, AutoDestroy>::destroy()
     //double-checked locking
     if (mInstance != 0)
     {
-        CriticalSection<sys::Mutex> obtainLock(&mMutex);
+        CriticalSection<mt::Mutex> obtainLock(&mMutex);
         if (mInstance != 0)
         {
             //we are OK to delete it
@@ -162,7 +162,7 @@ void Singleton<T, AutoDestroy>::destroy()
 }
 
 template<typename T, bool AutoDestroy> T* Singleton<T, AutoDestroy>::mInstance = 0;
-template<typename T, bool AutoDestroy> sys::Mutex Singleton<T, AutoDestroy>::mMutex;
+template<typename T, bool AutoDestroy> mt::Mutex Singleton<T, AutoDestroy>::mMutex;
 
 }
 #endif

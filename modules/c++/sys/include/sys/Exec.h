@@ -27,9 +27,9 @@
 #include <import/except.h>
 #include <str/Convert.h>
 
-#include "sys/Runnable.h"
-#include "sys/Err.h"
-#include "sys/ProcessInterface.h"
+#include <except/Err.h>
+#include <sys/Conf.h>
+//#include <mt/ProcessInterface.h>
 
 #ifdef _WIN32
 #define popen _popen
@@ -50,7 +50,7 @@ namespace sys
  *  allows us to use it from within a Process to create a
  *  'system()'-like functionality.
  */
-class Exec : public sys::Runnable
+class Exec
 {
 public:
     /*!
@@ -73,7 +73,7 @@ public:
     { 
         if (::system(mCmd.c_str()) == -1)
         {
-            sys::Err err;
+            except::Err err;
             throw except::IOException(
                 Ctxt("Unable to run system command: " + err.toString()));
         }
@@ -112,7 +112,7 @@ public:
         mOutStream = popen(mCmd.c_str(), "r");
         if (mOutStream == NULL)
         {
-            sys::Err err;
+            except::Err err;
             throw except::IOException(
                 Ctxt("Unable to open stream: " + err.toString()));
         }

@@ -26,11 +26,11 @@
 #include <vector>
 #include <memory>
 #include <exception>
-#include "sys/Runnable.h"
-#include "sys/Thread.h"
-#include "mem/SharedPtr.h"
-#include "except/Error.h"
-#include <sys/Mutex.h>
+#include <mt/Runnable.h>
+#include <mt/Thread.h>
+#include <mem/SharedPtr.h>
+#include <except/Error.h>
+#include <mt/Mutex.h>
 
 
 
@@ -43,7 +43,7 @@ namespace mt
  * \brief Basic thread group.
  *
  * This class is a basic thread group that can create threads from
- * sys::Runnable objects and wait for all threads to complete.
+ * mt::Runnable objects and wait for all threads to complete.
  *
  */
 class ThreadGroup
@@ -59,16 +59,16 @@ public:
     ~ThreadGroup();
     
     /*!
-    *  Creates and starts a thread from a sys::Runnable.
-    *  \param runnable pointer to sys::Runnable
+    *  Creates and starts a thread from a mt::Runnable.
+    *  \param runnable pointer to mt::Runnable
     */
-    void createThread(sys::Runnable *runnable);
+    void createThread(mt::Runnable *runnable);
     
     /*!
-    *  Creates and starts a thread from a sys::Runnable.
-    *  \param runnable auto_ptr to sys::Runnable
+    *  Creates and starts a thread from a mt::Runnable.
+    *  \param runnable auto_ptr to mt::Runnable
     */
-    void createThread(std::auto_ptr<sys::Runnable> runnable);
+    void createThread(std::auto_ptr<mt::Runnable> runnable);
     
     /*!
      * Waits for all threads to complete.
@@ -76,10 +76,10 @@ public:
     void joinAll();
 
 private:
-    std::vector<mem::SharedPtr<sys::Thread> > mThreads;
+    std::vector<mem::SharedPtr<mt::Thread> > mThreads;
     size_t mLastJoined;
     std::vector<except::Exception> mExceptions;
-    sys::Mutex mMutex;
+    mt::Mutex mMutex;
 
     /*!
      * Adds an exception to the mExceptions vector
@@ -92,12 +92,12 @@ private:
      * \brief Internal runnable class to safeguard against running
      * threads who throw exceptions
      */
-    class ThreadGroupRunnable : public sys::Runnable
+    class ThreadGroupRunnable : public mt::Runnable
     {
     public:
 
         //! Constructor.
-        ThreadGroupRunnable(std::auto_ptr<sys::Runnable> runnable,
+        ThreadGroupRunnable(std::auto_ptr<mt::Runnable> runnable,
                             mt::ThreadGroup& parentThreadGroup);
 
         /*!
@@ -106,7 +106,7 @@ private:
         virtual void run();
 
     private:
-        std::auto_ptr<sys::Runnable> mRunnable;
+        std::auto_ptr<mt::Runnable> mRunnable;
         mt::ThreadGroup& mParentThreadGroup;
 
     };

@@ -23,8 +23,7 @@
 #include "io/RotatingFileOutputStream.h"
 #include "io/FileOutputStream.h"
 
-io::RotatingFileOutputStream::RotatingFileOutputStream(
-                                                       const std::string& filename,
+io::RotatingFileOutputStream::RotatingFileOutputStream(const std::string& filename,
                                                        unsigned long maxBytes,
                                                        size_t backupCount,
                                                        int creationFlags) :
@@ -83,7 +82,7 @@ void io::RotatingFileOutputStream::doRollover()
             os.remove(curName);
         os.move(mFilename, curName);
     }
-    mProxy.reset(new io::FileOutputStream(mFilename, sys::File::CREATE));
+    mProxy.reset(new io::FileOutputStream(mFilename, io::File::CREATE));
     mByteCount = 0;
 }
 

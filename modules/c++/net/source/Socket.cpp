@@ -36,7 +36,7 @@ void net::Socket::listen(int backlog)
     // throw on failure
     if (::listen(mNative, backlog) != 0)
     {
-        sys::SocketErr err;
+        except::SocketErr err;
         throw sys::SocketException(
             Ctxt("Socket listen failure: " + err.toString()));
     }                               
@@ -49,7 +49,7 @@ void net::Socket::connect(const net::SocketAddress& address)
                   (net::ConnParam2_T *) &(address.getAddress()),
                   (SockLen_T) sizeof(address.getAddress())) != 0)
     {
-        sys::SocketErr err;
+        except::SocketErr err;
         throw sys::SocketException(
             Ctxt("Socket connect failure: " + err.toString()));
     }                               
@@ -62,7 +62,7 @@ void net::Socket::bind(const net::SocketAddress& address)
                (const struct sockaddr *) &(address.getAddress()),
                (SockLen_T) sizeof(address.getAddress())) != 0)
     {
-        sys::SocketErr err;
+        except::SocketErr err;
         throw sys::SocketException(
             Ctxt("Socket bind failure: " + err.toString()));
     }                               
@@ -97,7 +97,7 @@ sys::SSize_T net::Socket::recv(sys::byte* b, sys::Size_T len, int flags)
         std::cout << "=============================================" << std::endl << std::endl;
 #endif
 
-        sys::Err err;
+        except::Err err;
         std::ostringstream oss;
         oss << "When receiving " << str::toString<sys::Size_T>(len) << " bytes: " << 
             err.toString(); 
@@ -133,7 +133,7 @@ sys::SSize_T net::Socket::recvFrom(net::SocketAddress& address, sys::byte* b,
             (struct sockaddr *) &in, &addrLen);
     if (bytes == -1)
     {
-        sys::Err err;
+        except::Err err;
         throw sys::SocketException(
             Ctxt("Socket error while receiving bytes: " +  err.toString()));
     }
@@ -158,7 +158,7 @@ void net::Socket::send(const sys::byte* b, sys::Size_T len, int flags)
 
     if (numBytes == -1 || (sys::Size_T)numBytes != len)
     {
-        sys::Err err;
+        except::Err err;
         std::ostringstream oss;
         oss << "Tried sending " << str::toString<sys::Size_T>(len) << " bytes, " <<
                 str::toString<int>(numBytes) << " sent: " <<  err.toString(); 
@@ -177,7 +177,7 @@ void net::Socket::sendTo(const SocketAddress& address, const sys::byte* b,
     // Maybe shouldnt even bother with this
     if (numBytes == -1 || (sys::Size_T)numBytes != len)
     {
-        sys::Err err;
+        except::Err err;
         std::ostringstream oss;
         oss << "Tried sending " << str::toString<sys::Size_T>(len) << " bytes, " <<
                 str::toString<int>(numBytes) << " sent: " <<  err.toString(); 

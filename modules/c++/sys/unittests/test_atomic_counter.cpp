@@ -25,8 +25,8 @@
 #include <algorithm>
 
 #include <sys/AtomicCounter.h>
-#include <sys/Runnable.h>
-#include <sys/Thread.h>
+#include <mt/Runnable.h>
+#include <mt/Thread.h>
 
 #include "TestCase.h"
 
@@ -88,7 +88,7 @@ TEST_CASE(testDecrement)
     TEST_ASSERT_EQ(ctr.get(), 95);
 }
 
-class IncrementAtomicCounter : public sys::Runnable
+class IncrementAtomicCounter : public mt::Runnable
 {
 public:
     IncrementAtomicCounter(size_t numIncrements,
@@ -121,7 +121,7 @@ TEST_CASE(testThreadedIncrement)
 
     std::vector<ValueType> values(numThreads * numIncrements);
     std::vector<const ValueType*> valuesPtr(numThreads);
-    std::vector<sys::Thread *> threads(numThreads);
+    std::vector<mt::Thread *> threads(numThreads);
     sys::AtomicCounter ctr(0);
 
     // Create all the threads
@@ -129,7 +129,7 @@ TEST_CASE(testThreadedIncrement)
     for (size_t ii = 0; ii < numThreads; ++ii, ptr += numIncrements)
     {
         threads[ii] =
-            new sys::Thread(new IncrementAtomicCounter(numIncrements,
+            new mt::Thread(new IncrementAtomicCounter(numIncrements,
                                                        ctr,
                                                        ptr));
         valuesPtr[ii] = ptr;
@@ -165,7 +165,7 @@ TEST_CASE(testThreadedIncrement)
     }
 }
 
-class DecrementAtomicCounter : public sys::Runnable
+class DecrementAtomicCounter : public mt::Runnable
 {
 public:
     DecrementAtomicCounter(size_t numDecrements,
@@ -198,7 +198,7 @@ TEST_CASE(testThreadedDecrement)
 
     std::vector<ValueType> values(numThreads * numDecrements);
     std::vector<const ValueType*> valuesPtr(numThreads);
-    std::vector<sys::Thread *> threads(numThreads);
+    std::vector<mt::Thread *> threads(numThreads);
     sys::AtomicCounter ctr(numThreads * numDecrements - 1);
 
     // Create all the threads
@@ -206,7 +206,7 @@ TEST_CASE(testThreadedDecrement)
     for (size_t ii = 0; ii < numThreads; ++ii, ptr += numDecrements)
     {
         threads[ii] =
-            new sys::Thread(new DecrementAtomicCounter(numDecrements,
+            new mt::Thread(new DecrementAtomicCounter(numDecrements,
                                                        ctr,
                                                        ptr));
         valuesPtr[ii] = ptr;

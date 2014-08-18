@@ -44,7 +44,7 @@ class FileHandler : public StreamHandler
 
 public:
     FileHandler(const std::string& fname, LogLevel level = LogLevel::LOG_NOTSET,
-                int creationFlags = sys::File::CREATE | sys::File::TRUNCATE) :
+                int creationFlags = io::File::CREATE | io::File::TRUNCATE) :
         StreamHandler(new io::FileOutputStream(fname, creationFlags), level)
     {
         // In case we are in append mode

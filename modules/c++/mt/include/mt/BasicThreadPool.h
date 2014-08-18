@@ -24,13 +24,13 @@
 #define __MT_BASIC_THREAD_POOL_H__
 
 #include <vector>
-#include "except/Exception.h"
-#include "sys/Mutex.h"
-#include "sys/Thread.h"
-#include "mt/RequestQueue.h"
-#include "mt/GenericRequestHandler.h"
-#include "mt/ThreadPoolException.h"
-#include "mem/SharedPtr.h"
+#include <except/Exception.h>
+#include <mt/Mutex.h>
+#include <mt/Thread.h>
+#include <mt/RequestQueue.h>
+#include <mt/GenericRequestHandler.h>
+#include <mt/ThreadPoolException.h>
+#include <mem/SharedPtr.h>
 
 namespace mt
 {
@@ -106,7 +106,7 @@ public:
         mNumThreads = (bySize > mNumThreads) ? 0 : mNumThreads - bySize;
     }
 
-    void addRequest(sys::Runnable *handler)
+    void addRequest(mt::Runnable *handler)
     {
         mHandlerQueue.enqueue(handler);
     }
@@ -119,7 +119,7 @@ public:
     void shutdown()
     {
         // Add requests that signal the thread should stop
-        static sys::Runnable *stopSignal = NULL;
+        static mt::Runnable *stopSignal = NULL;
         for (size_t i = 0; i < mPool.size(); ++i)
         {
             addRequest(stopSignal);
@@ -146,14 +146,14 @@ protected:
 
     bool mStarted;
     size_t mNumThreads;
-    std::vector<mem::SharedPtr<sys::Thread> > mPool;
+    std::vector<mem::SharedPtr<mt::Thread> > mPool;
     mt::RunnableRequestQueue mHandlerQueue;
 
 private:
     void addThread()
     {
-        mem::SharedPtr<sys::Thread>
-                thread(new sys::Thread(newRequestHandler()));
+        mem::SharedPtr<mt::Thread>
+                thread(new mt::Thread(newRequestHandler()));
         mPool.push_back(thread);
         thread->start();
     }

@@ -50,7 +50,7 @@ void mt::TiedRequestHandler::run()
     while (true)
     {   
 	// Pull a runnable off the queue
-	sys::Runnable *handler = NULL;
+	mt::Runnable *handler = NULL;
 	
 	mRequestQueue->dequeue(handler);
 	if (!handler) return;
@@ -68,7 +68,7 @@ void mt::TiedRequestHandler::run()
 }
 
 // Not set up for multiple producers 
-void mt::GenerationThreadPool::addGroup(const std::vector<sys::Runnable*>& toRun)
+void mt::GenerationThreadPool::addGroup(const std::vector<mt::Runnable*>& toRun)
 {
     
     if (mGenSize)
@@ -93,7 +93,7 @@ void mt::GenerationThreadPool::waitGroup()
 /*void mt::GenerationThreadPool::shutdown()
 {
     size_t size = mPool.size();
-    static sys::Runnable* shutdown = NULL;
+    static mt::Runnable* shutdown = NULL;
     for(unsigned int i=0; i < size; i++)
     {
 	addRequest(shutdown);

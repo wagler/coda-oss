@@ -26,11 +26,11 @@
 
 #include <vector>
 
-#include "sys/Thread.h"
-#include "mt/RequestQueue.h"
-#include "mt/ThreadPoolException.h"
-#include "mt/WorkerThread.h"
-#include "mem/SharedPtr.h"
+#include <mt/Thread.h>
+#include <mt/RequestQueue.h>
+#include <mt/ThreadPoolException.h>
+#include <mt/WorkerThread.h>
+#include <mem/SharedPtr.h>
 
 namespace mt
 {
@@ -75,7 +75,7 @@ public:
     {
         for (size_t i = 0; i < mNumThreads; i++)
         {
-            mPool.push_back(mem::SharedPtr<sys::Thread>(newWorker()));
+            mPool.push_back(mem::SharedPtr<mt::Thread>(newWorker()));
             mPool[i]->start();
         }
     }
@@ -132,7 +132,7 @@ protected:
     }
 
     size_t mNumThreads;
-    std::vector<mem::SharedPtr<sys::Thread> > mPool;
+    std::vector<mem::SharedPtr<mt::Thread> > mPool;
     mt::RequestQueue<Request_T> mRequestQueue;
 };
 }

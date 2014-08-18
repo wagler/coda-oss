@@ -26,7 +26,7 @@
 #if !defined(USE_IO_STREAMS)
 
 #include "io/SeekableStreams.h"
-#include "sys/File.h"
+#include "io/File.h"
 
 
 /*!
@@ -51,7 +51,7 @@ class FileOutputStreamOS : public SeekableOutputStream
 
 {
 protected:
-    sys::File mFile;
+    io::File mFile;
 public:
     //!  Default constructor
     FileOutputStreamOS()
@@ -61,10 +61,10 @@ public:
     /*!
      *  Alternate Constructor.  Takes an output file and a mode
      *  \param outputFile The file name
-     *  \param creationFlags  see sys::File
+     *  \param creationFlags  see io::File
      */
     FileOutputStreamOS(const std::string& outputFile,
-                       int creationFlags = sys::File::CREATE | sys::File::TRUNCATE);
+                       int creationFlags = io::File::CREATE | io::File::TRUNCATE);
 
 
     //! Destructor, closes the file stream.
@@ -83,10 +83,10 @@ public:
     /*!
      *  Open the file in the mode provided
      *  \param file The file to open
-     *  \param creationFlags see sys::File
+     *  \param creationFlags see io::File
      */
     virtual void create(const std::string& str,
-                        int creationFlags = sys::File::CREATE | sys::File::TRUNCATE);
+                        int creationFlags = io::File::CREATE | io::File::TRUNCATE);
 
     //!  Close the file
     void close()

@@ -176,14 +176,14 @@ void io::FileUtils::touchFile(std::string filename) throw (except::IOException)
     sys::OS os;
     if (os.exists(filename))
     {
-        io::FileOutputStream f(filename, sys::File::EXISTING
-                | sys::File::WRITE_ONLY);
+        io::FileOutputStream f(filename, io::File::EXISTING
+                | io::File::WRITE_ONLY);
         f.close();
     }
     else
     {
-        io::FileOutputStream f(filename, sys::File::CREATE
-                | sys::File::TRUNCATE);
+        io::FileOutputStream f(filename, io::File::CREATE
+                | io::File::TRUNCATE);
         f.close();
     }
 }

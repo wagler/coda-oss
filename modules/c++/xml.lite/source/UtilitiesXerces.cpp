@@ -24,7 +24,7 @@
 
 #if defined(USE_XERCES)
 
-sys::Mutex xml::lite::XercesContext::mMutex;
+mt::Mutex xml::lite::XercesContext::mMutex;
 
 xml::lite::XercesLocalString::XercesLocalString(XMLCh* xmlStr) :
     mLocal(xmlStr)
@@ -185,7 +185,7 @@ xml::lite::XercesContext::XercesContext() :
     //! XMLPlatformUtils::Initialize is not thread safe!
     try
     {
-        mt::CriticalSection<sys::Mutex> cs(&mMutex);
+        mt::CriticalSection<mt::Mutex> cs(&mMutex);
         XMLPlatformUtils::Initialize();
     }
     catch (const ::XMLException& toCatch)
@@ -215,7 +215,7 @@ void xml::lite::XercesContext::destroy()
         //! XMLPlatformUtils::Terminate is not thread safe!
         try
         {
-            mt::CriticalSection<sys::Mutex> cs(&mMutex);
+            mt::CriticalSection<mt::Mutex> cs(&mMutex);
             XMLPlatformUtils::Terminate();
             mIsDestroyed = true;
         }

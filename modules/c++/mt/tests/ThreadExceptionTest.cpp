@@ -4,7 +4,7 @@
 #include <import/mt.h>
 #include <import/sys.h>
 
-sys::Mutex globalMutex;
+mt::Mutex globalMutex;
 
 /*-- except::Exception --*/
 void print(char a)
@@ -18,7 +18,7 @@ void print(char a)
     throw except::Exception(Ctxt("char exception"));
 }
 
-class PrintChar : public sys::Runnable
+class PrintChar : public mt::Runnable
 {
 public:
     char a;
@@ -50,7 +50,7 @@ void add(sys::Uint32_T x, sys::Uint32_T y)
     throw stdExcept();
 }
 
-class AddInts : public sys::Runnable
+class AddInts : public mt::Runnable
 {
 public:
     sys::Uint32_T x, y;
@@ -76,7 +76,7 @@ void printConcat(const std::string& x, const std::string& y)
 	throw double();
 }
 
-class ConcatStr: public sys::Runnable
+class ConcatStr: public mt::Runnable
 {
 public:
 	std::string x;

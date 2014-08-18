@@ -21,14 +21,15 @@
  */
 
 #include <import/logging.h>
+#include <import/mt.h>
 #include "TestCase.h"
 
-class RunNothing : public sys::Runnable
+class RunNothing : public mt::Runnable
 {
 private:
     size_t& counter;
     logging::ExceptionLogger* exLog;
-    static sys::Mutex counterLock;
+    static mt::Mutex counterLock;
 public:
     RunNothing(size_t& c, logging::ExceptionLogger* el) : counter(c), exLog(el) {}
 
@@ -38,7 +39,7 @@ public:
             return;
        
         {
-            mt::CriticalSection<sys::Mutex> crit(&counterLock);
+            mt::CriticalSection<mt::Mutex> crit(&counterLock);
             counter++;
         }
 
@@ -46,7 +47,7 @@ public:
     }
 };
 
-sys::Mutex RunNothing::counterLock;
+mt::Mutex RunNothing::counterLock;
 
 TEST_CASE(testExceptionLogger)
 {
@@ -59,7 +60,7 @@ TEST_CASE(testExceptionLogger)
     size_t counter(0);
     size_t numThreads(2);
  
-    std::vector<sys::Runnable*> runs;
+    std::vector<mt::Runnable*> runs;
    
     mt::GenerationThreadPool pool(numThreads);
     pool.start();

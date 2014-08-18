@@ -23,7 +23,7 @@
 #ifndef __NET_PER_REQUEST_THREAD_ALLOC_STRATEGY_H__
 #define __NET_PER_REQUEST_THREAD_ALLOC_STRATEGY_H__
 
-#include "sys/Thread.h"
+#include "mt/Thread.h"
 #include "net/RequestHandler.h"
 #include "net/AllocStrategy.h"
 
@@ -45,7 +45,7 @@ namespace net
  *
  */
 
-class RequestHandlerThread : public sys::Thread
+class RequestHandlerThread : public mt::Thread
 {
     RequestHandler* mRequestHandler;
     NetConnection* mConnection;

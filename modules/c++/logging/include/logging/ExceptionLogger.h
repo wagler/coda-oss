@@ -29,7 +29,7 @@
 
 #include "logging/Logger.h"
 #include "logging/StreamHandler.h"
-#include <sys/Mutex.h>
+#include <mt/Mutex.h>
 #include <mt/CriticalSection.h>
 
 namespace logging
@@ -43,7 +43,7 @@ namespace logging
 class ExceptionLogger
 {
 protected:
-    sys::Mutex mLock;
+    mt::Mutex mLock;
 
     Logger* mLogger;
 
@@ -58,14 +58,14 @@ public:
     //! Tells whether it has logged at least one exception
     bool hasLogged()
     {
-        mt::CriticalSection<sys::Mutex> crit(&mLock);
+        mt::CriticalSection<mt::Mutex> crit(&mLock);
         return mHasLogged;
     }
 
     //! Log the exception/throwable
     void log(const except::Throwable& t, LogLevel logLevel)
     {
-        mt::CriticalSection<sys::Mutex> crit(&mLock);
+        mt::CriticalSection<mt::Mutex> crit(&mLock);
         mLogger->log(logLevel, t);
         mHasLogged = true;
     }

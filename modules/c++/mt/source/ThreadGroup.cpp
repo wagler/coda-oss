@@ -40,15 +40,15 @@ mt::ThreadGroup::~ThreadGroup()
     }
 }
 
-void mt::ThreadGroup::createThread(sys::Runnable *runnable)
+void mt::ThreadGroup::createThread(mt::Runnable *runnable)
 {
-    createThread(std::auto_ptr<sys::Runnable>(runnable));
+    createThread(std::auto_ptr<mt::Runnable>(runnable));
 }
 
-void mt::ThreadGroup::createThread(std::auto_ptr<sys::Runnable> runnable)
+void mt::ThreadGroup::createThread(std::auto_ptr<mt::Runnable> runnable)
 {
-    std::auto_ptr<sys::Runnable> internalRunnable(new ThreadGroupRunnable(runnable, *this));
-    mem::SharedPtr<sys::Thread> thread(new sys::Thread(internalRunnable.get()));
+    std::auto_ptr<mt::Runnable> internalRunnable(new ThreadGroupRunnable(runnable, *this));
+    mem::SharedPtr<mt::Thread> thread(new mt::Thread(internalRunnable.get()));
     internalRunnable.release();
     mThreads.push_back(thread);
     thread->start();
@@ -88,7 +88,7 @@ void mt::ThreadGroup::addException(const except::Exception& ex)
 {
     try
     {
-        mt::CriticalSection<sys::Mutex> pushLock(&mMutex);
+        mt::CriticalSection<mt::Mutex> pushLock(&mMutex);
         mExceptions.push_back(ex);
     }
     catch(...)
@@ -98,7 +98,7 @@ void mt::ThreadGroup::addException(const except::Exception& ex)
 }
 
 mt::ThreadGroup::ThreadGroupRunnable::ThreadGroupRunnable
-    (std::auto_ptr<sys::Runnable> runnable, mt::ThreadGroup& parentThreadGroup):
+    (std::auto_ptr<mt::Runnable> runnable, mt::ThreadGroup& parentThreadGroup):
         mRunnable(runnable), mParentThreadGroup(parentThreadGroup)
 {
 }

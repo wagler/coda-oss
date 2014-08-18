@@ -24,10 +24,10 @@
 #define __MT_REQUEST_QUEUE_H__
 
 #include <queue>
-#include "sys/Thread.h"
-#include "sys/ConditionVar.h"
-#include "sys/Mutex.h"
-#include "sys/Dbg.h"
+#include <mt/Thread.h>
+#include <mt/ConditionVar.h>
+#include <mt/Mutex.h>
+#include <sys/Dbg.h>
 
 namespace mt
 {
@@ -137,14 +137,14 @@ private:
     //! The internal data structure
     std::queue<T> mRequestQueue;
     //! The synchronizer
-    sys::Mutex mQueueLock;
+    mt::Mutex mQueueLock;
     //! This condition is "is there space?"
-    sys::ConditionVar mAvailableSpace;
+    mt::ConditionVar mAvailableSpace;
     //! This condition is "is there an item?"
-    sys::ConditionVar mAvailableItems;
+    mt::ConditionVar mAvailableItems;
 };
 
-typedef RequestQueue<sys::Runnable*> RunnableRequestQueue;
+typedef RequestQueue<mt::Runnable*> RunnableRequestQueue;
 }
 
 #endif // __MT_REQUEST_QUEUE_H__

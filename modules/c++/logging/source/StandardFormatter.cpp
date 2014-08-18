@@ -26,7 +26,7 @@
 
 #include <sstream>
 #include <iostream>
-#include <import/sys.h>
+#include <import/mt.h>
 #include <import/str.h>
 #include "logging/StandardFormatter.h"
 
@@ -46,7 +46,7 @@ void StandardFormatter::format(const LogRecord* record, io::OutputStream& os) co
     std::string name = (record->getName().empty()) ? ("DEFAULT") : record->getName();
 
     // populate log
-    long threadId = sys::getThreadID();
+    long threadId = mt::getThreadID();
     std::string format = mFmt;
     str::replace(format, THREAD_ID, str::toString(threadId));
     str::replace(format, LOG_NAME,  name);

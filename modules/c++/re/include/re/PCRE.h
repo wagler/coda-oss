@@ -29,8 +29,9 @@
 #define USE_PCRE
 #endif
 
-#include "sys/Err.h"
-#include "re/PCREException.h"
+#include <except/Err.h>
+#include <sys/Conf.h>
+#include <re/PCREException.h>
 #include <pcre.h>
 #include <pcreposix.h>
 #include <string>

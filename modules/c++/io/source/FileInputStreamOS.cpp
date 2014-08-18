@@ -35,9 +35,9 @@
 sys::Off_T io::FileInputStreamOS::available()
 {
     sys::Off_T where = mFile.getCurrentOffset();
-    mFile.seekTo(0, sys::File::FROM_END);
+    mFile.seekTo(0, io::File::FROM_END);
     sys::Off_T until = mFile.getCurrentOffset();
-    mFile.seekTo(where, sys::File::FROM_START);
+    mFile.seekTo(where, io::File::FROM_START);
 
     return (until - where);
 }

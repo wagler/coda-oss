@@ -50,9 +50,8 @@ typedef void* DYNAMIC_LIBRARY;
 typedef void* DLL_FUNCTION_PTR;
 # endif
 
-#include "except/Exception.h"
-#include "sys/Err.h"
-
+#include <except/Exception.h>
+#include <except/Err.h>
 
 namespace sys
 {

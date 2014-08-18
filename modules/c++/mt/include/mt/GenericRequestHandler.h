@@ -24,8 +24,8 @@
 #ifndef __MT_GENERIC_REQUEST_HANDLER_H__
 #define __MT_GENERIC_REQUEST_HANDLER_H__
 
-#include "sys/Thread.h"
-#include "mt/RequestQueue.h"
+#include <mt/Thread.h>
+#include <mt/RequestQueue.h>
 
 namespace mt
 {
@@ -40,7 +40,7 @@ namespace mt
  *  This class is really only used if you are using a BasicThreadPool.
  *  
  */
-class GenericRequestHandler : public sys::Runnable
+class GenericRequestHandler : public mt::Runnable
 {
 public:
     //! Constructor

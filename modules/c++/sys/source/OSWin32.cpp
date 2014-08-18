@@ -25,7 +25,6 @@
 
 #include <sstream>
 #include "sys/OSWin32.h"
-#include "sys/File.h"
 
 #include <iostream>
 
@@ -101,7 +100,7 @@ void sys::OSWin32::removeFile(const std::string& pathname) const
 {
     if (DeleteFile(pathname.c_str()) != true)
     {
-        sys::Err err;
+        except::Err err;
         std::ostringstream oss;
         oss << "Failure removing file [" <<  pathname << 
             "] with error [" << err.toString() << "]";
@@ -114,7 +113,7 @@ void sys::OSWin32::removeDirectory(const std::string& pathname) const
 {
     if (RemoveDirectory(pathname.c_str()) != true)
     {
-        sys::Err err;
+        except::Err err;
         std::ostringstream oss;
         oss << "Failure removing directory [" <<  pathname << 
             "] with error [" << err.toString() << "]";
@@ -187,12 +186,34 @@ std::string sys::OSWin32::getTempName(const std::string& path,
 
 sys::Off_T sys::OSWin32::getSize(const std::string& path) const
 {
-    return sys::File(path).length();
+    DWORD highOff;
+    HANDLE handle = CreateFile(path.c_str(), GENERIC_READ, 
+                               FILE_SHARE_READ, NULL, OPEN_EXISTING, 
+                               FILE_ATTRIBUTE_NORMAL, NULL);
+    DWORD ret = GetFileSize(handle, &highOff);
+    sys::Uint64_T off = highOff;
+    return (sys::Off_T)(off << 32) + ret;
 }
 
 sys::Off_T sys::OSWin32::getLastModifiedTime(const std::string& path) const
 {
-    return sys::File(path).lastModifiedTime();
+    FILETIME creationTime, lastAccessTime, lastWriteTime;
+    HANDLE handle = CreateFile(path.c_str(), GENERIC_READ, 
+                               FILE_SHARE_READ, NULL, OPEN_EXISTING, 
+                               FILE_ATTRIBUTE_NORMAL, NULL);
+    BOOL ret = GetFileTime(handle, &creationTime,
+            &lastAccessTime, &lastWriteTime);
+    if (ret)
+    {
+        ULARGE_INTEGER uli;
+        uli.LowPart = lastWriteTime.dwLowDateTime;
+        uli.HighPart = lastWriteTime.dwHighDateTime;
+        ULONGLONG stInMillis(uli.QuadPart/10000);
+        return (sys::Off_T)stInMillis;
+    }
+    throw sys::SystemException(Ctxt(
+                    FmtX("Error getting last modified time for path %s",
+                            path.c_str())));
 }
 
 void sys::OSWin32::millisleep(int milliseconds) const
@@ -279,7 +300,7 @@ void sys::OSWin32::removeSymlink(const std::string& symlinkPathname) const
 {
 	if (RemoveDirectory(symlinkPathname.c_str()) != true)
     {
-        sys::Err err;
+        except::Err err;
         std::ostringstream oss;
         oss << "Failure removing symlink [" <<  symlinkPathname <<
             "] with error [" << err.toString() << "]";

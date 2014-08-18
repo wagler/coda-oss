@@ -138,7 +138,7 @@ public:
                          (net::SockLen_T)sizeof(T)) != 0)
         {
             // capture the error
-            sys::SocketErr err; 
+            except::SocketErr err; 
 
 #if defined(WIN32) || defined(_WIN32)
 

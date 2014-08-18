@@ -41,13 +41,13 @@ class Logger
 {
 private:
     int num;
-    sys::Mutex mutex;
+    mt::Mutex mutex;
 public:
     Logger():num(0){ std::cout << "In Logger Constructor." << std::endl; }
     ~Logger(){ std::cout << "In Logger Destructor." << std::endl; }
     void log(std::string msg)
     {
-        mt::CriticalSection<sys::Mutex> obtainLock(&mutex);
+        mt::CriticalSection<mt::Mutex> obtainLock(&mutex);
         std::cout << "INFO[" << num++ << "]: " << msg << std::endl;
     }
 };

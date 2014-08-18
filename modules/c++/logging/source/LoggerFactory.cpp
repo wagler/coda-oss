@@ -24,12 +24,12 @@
 //  LoggerFactory.cpp
 ///////////////////////////////////////////////////////////
 
-#include "logging/LoggerFactory.h"
+#include <logging/LoggerFactory.h>
 
 mem::SharedPtr<logging::Logger>
 logging::LoggerManager::getLoggerSharedPtr(const std::string& name)
 {
-    mt::CriticalSection<sys::Mutex> obtainLock(&mMutex);
+    mt::CriticalSection<mt::Mutex> obtainLock(&mMutex);
 
     const std::map<std::string, mem::SharedPtr<Logger> >::const_iterator iter =
             mLoggerMap.find(name);

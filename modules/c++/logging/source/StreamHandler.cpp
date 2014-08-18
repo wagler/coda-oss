@@ -74,7 +74,7 @@ void logging::StreamHandler::write(const std::string& str)
     if (!str.empty())
     {
         //acquire lock
-        mt::CriticalSection<sys::Mutex> lock(&mHandlerLock);
+        mt::CriticalSection<mt::Mutex> lock(&mHandlerLock);
 
         // write to stream
         mStream->write(str);

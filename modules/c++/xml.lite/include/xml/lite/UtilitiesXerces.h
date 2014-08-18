@@ -54,7 +54,7 @@
 #include <io/StringStream.h>
 #include <io/OutputStream.h>
 #include <io/InputStream.h>
-#include <sys/Mutex.h>
+#include <mt/Mutex.h>
 #include <mt/CriticalSection.h>
 #include "xml/lite/XMLException.h"
 #include "xml/lite/ContentHandler.h"
@@ -427,7 +427,7 @@ public:
     
 private:
 
-    static sys::Mutex mMutex;
+    static mt::Mutex mMutex;
     bool mIsDestroyed;
 };
 

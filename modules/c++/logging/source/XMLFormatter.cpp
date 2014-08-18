@@ -21,7 +21,7 @@
  */
 #include <sstream>
 #include <iostream>
-#include <import/sys.h>
+#include <import/mt.h>
 #include <import/str.h>
 #include "logging/XMLFormatter.h"
 
@@ -64,7 +64,7 @@ void logging::XMLFormatter::format(const logging::LogRecord* record, io::OutputS
     std::string name = (record->getName().empty()) ? 
         ("DEFAULT") : record->getName();
     std::string line = str::toString<int>(record->getLineNum());
-    std::string threadID =  str::toString(sys::getThreadID());
+    std::string threadID =  str::toString(mt::getThreadID());
 
 
     std::string xmlSC = XML_SAFE_CONVERSION;

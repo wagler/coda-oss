@@ -24,7 +24,7 @@
 #ifndef __SYSTEM_EXCEPTION_H__
 #define __SYSTEM_EXCEPTION_H__
 
-#include "sys/Err.h"
+#include "except/Err.h"
 #include "except/Error.h"
 #include "except/Exception.h"
 
@@ -52,7 +52,7 @@ public:
     SystemException(const std::string& userMessage) :
             except::Exception(userMessage)
     {
-        Err e;
+        except::Err e;
         mMessage += std::string(": ") + e.toString();
     }
 
@@ -63,7 +63,7 @@ public:
     SystemException(const except::Context& c) :
             except::Exception(c)
     {
-        Err e;
+        except::Err e;
         mMessage += std::string(": ") + e.toString();
     }
 
@@ -74,7 +74,7 @@ public:
     SystemException(const char *userMessage) :
             except::Exception(userMessage)
     {
-        Err e;
+        except::Err e;
         mMessage += std::string(": ") + e.toString();
     }
 
@@ -86,7 +86,7 @@ public:
     SystemException(const char *userMessage, int errorId):
             except::Exception(userMessage)
     {
-        Err e(errorId);
+        except::Err e(errorId);
         mMessage += std::string(": ") + e.toString();
     }
 
@@ -98,7 +98,7 @@ public:
     SystemException(const std::string& userMessage, int errorId) :
             except::Exception(userMessage)
     {
-        Err e(errorId);
+        except::Err e(errorId);
         mMessage += std::string(": ") + e.toString();
     }
 };
@@ -121,7 +121,7 @@ public:
     SystemError(const std::string& userMessage) :
             except::Error(userMessage)
     {
-        Err e;
+        except::Err e;
         mMessage += std::string(": ") + e.toString();
     }
 
@@ -132,7 +132,7 @@ public:
     SystemError(const char *userMessage) :
             except::Error(userMessage)
     {
-        Err e;
+        except::Err e;
         mMessage += std::string(": ") + e.toString();
     }
 
@@ -144,7 +144,7 @@ public:
     SystemError(const char *userMessage, int errorId):
             except::Error(userMessage)
     {
-        Err e(errorId);
+        except::Err e(errorId);
         mMessage += std::string(": ") + e.toString();
     }
 
@@ -156,7 +156,7 @@ public:
     SystemError(const std::string& userMessage, int errorId) :
             except::Error(userMessage)
     {
-        Err e(errorId);
+        except::Err e(errorId);
         mMessage += std::string(": ") + e.toString();
     }
 
@@ -167,7 +167,7 @@ public:
     SystemError(const except::Context& c) :
             except::Error(c)
     {
-        Err e;
+        except::Err e;
         mMessage += std::string(": ") + e.toString();
     }
 };

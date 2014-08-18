@@ -36,9 +36,9 @@ using namespace mt;
 using namespace sys;
 const int TO_SLEEP = 2;
 const int NUM_GENS = 3;
-sys::Mutex gLock;
+mt::Mutex gLock;
 
-class MyRunTask : public sys::Runnable
+class MyRunTask : public mt::Runnable
 {
     int mI;
 public:
@@ -55,7 +55,7 @@ public:
         sleep(TO_SLEEP);
 
         // Goes out of scope when we finish printing and return
-        mt::CriticalSection < sys::Mutex > cs(&gLock);
+        mt::CriticalSection < mt::Mutex > cs(&gLock);
         std::cout << "Run " << mI << " completed" << std::endl;
 
     }

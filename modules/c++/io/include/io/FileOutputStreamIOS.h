@@ -65,18 +65,18 @@ public:
     /*!
      *  Alternate Constructor.  Takes an output file and a mode
      *  \param outputFile The file name
-     *  \param creationFlags see sys::File
+     *  \param creationFlags see io::File
      */
     FileOutputStreamIOS(const std::string& outputFile,
-                       int creationFlags = sys::File::CREATE | sys::File::TRUNCATE);
+                       int creationFlags = io::File::CREATE | io::File::TRUNCATE);
 
     /*!
      *  Alternate Constructor.  Takes an output file and a mode
      *  \param outputFile The file name
-     *  \param creationFlags see sys::File
+     *  \param creationFlags see io::File
      */
     FileOutputStreamIOS(const char* outputFile,
-                       int creationFlags = sys::File::CREATE | sys::File::TRUNCATE);
+                       int creationFlags = io::File::CREATE | io::File::TRUNCATE);
 
     //! Deconstructor, closes the file stream.
     virtual ~FileOutputStreamIOS()

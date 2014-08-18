@@ -166,12 +166,22 @@ std::string sys::OSUnix::getTempName(const std::string& path,
 
 sys::Off_T sys::OSUnix::getSize(const std::string& path) const
 {
-    return sys::File(path).length();
+    struct stat buf;
+    int handle = open(path.c_str(), O_RDONLY, _SYS_DEFAULT_PERM);
+    int rval = fstat(handle, &buf);
+    if (rval == -1)
+        throw sys::SystemException(Ctxt("Error querying file attributes"));
+    return buf.st_size;
 }
 
 sys::Off_T sys::OSUnix::getLastModifiedTime(const std::string& path) const
 {
-    return sys::File(path).lastModifiedTime();
+    struct stat buf;
+    int handle = open(path.c_str(), O_RDONLY, _SYS_DEFAULT_PERM);
+    int rval = fstat(handle, &buf);
+    if (rval == -1)
+        throw sys::SystemException(Ctxt("Error querying file attributes"));
+    return (sys::Off_T) buf.st_mtime * 1000;
 }
 
 void sys::OSUnix::millisleep(int milliseconds) const

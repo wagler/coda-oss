@@ -71,6 +71,7 @@
 #include "io/SerializableArray.h"
 #include "io/CountingStreams.h"
 #include "io/RotatingFileOutputStream.h"
+#include "io/File.h"
 
 //#include "io/MMapInputStream.h"
 //using namespace io;

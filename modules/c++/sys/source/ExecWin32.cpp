@@ -23,7 +23,7 @@
 
 #if defined(WIN32)
 
-#include "sys/Err.h"
+#include "except/Err.h"
 #include "sys/Exec.h"
 
 int sys::ExecPipe::closePipe()
@@ -41,7 +41,7 @@ int sys::ExecPipe::closePipe()
     const int exitStatus  = pclose(tmp);
     if (exitStatus == -1)
     {
-        sys::SocketErr err;
+        except::SocketErr err;
         throw except::IOException(
                 Ctxt("Failure while closing stream to child process: " + 
                      err.toString()));

@@ -25,7 +25,7 @@ class LoggerManager
 {
 private:
     std::map<std::string, mem::SharedPtr<Logger> > mLoggerMap; //! map for storing Loggers
-    sys::Mutex mMutex; //! mutex used for locking the map
+    mt::Mutex mMutex; //! mutex used for locking the map
 
 public:
     LoggerManager()

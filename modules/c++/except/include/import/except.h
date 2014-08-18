@@ -64,6 +64,7 @@
 #include "except/Context.h"
 #include "except/Trace.h"
 #include "except/Throwable.h"
+#include "except/Err.h"
 #include "except/Error.h"
 #include "except/Exception.h"
 #define EXCEPT_MAJOR_VERSION 0

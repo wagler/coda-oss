@@ -24,8 +24,7 @@
 //  Handler.cpp
 ///////////////////////////////////////////////////////////
 
-#include "logging/Handler.h"
-
+#include <logging/Handler.h>
 
 logging::Handler::Handler(logging::LogLevel level)
 {
@@ -40,7 +39,9 @@ void logging::Handler::close()
     // delete if necessary
     if (mFormatter != &mDefaultFormatter &&
         mFormatter != NULL)
+    {
         delete mFormatter;
+    }
 }
 
 void logging::Handler::setLevel(logging::LogLevel level)
@@ -54,7 +55,7 @@ bool logging::Handler::handle(const logging::LogRecord* record)
     if (filter(record))
     {
         //acquire lock
-        mt::CriticalSection<sys::Mutex> lock(&mHandlerLock);
+        mt::CriticalSection<mt::Mutex> lock(&mHandlerLock);
         try
         {
             emitRecord(record);

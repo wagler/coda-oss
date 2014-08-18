@@ -69,7 +69,7 @@ RotatingFileHandler::RotatingFileHandler(const std::string& fname,
     }
     
     // create log file
-    creationFlags = sys::File::CREATE | sys::File::TRUNCATE;
+    creationFlags = io::File::CREATE | io::File::TRUNCATE;
     mStream.reset(new io::RotatingFileOutputStream(fname, maxBytes,
                                                    backupCount, creationFlags));
 }

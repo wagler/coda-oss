@@ -88,7 +88,7 @@ protected:
 
 
     LogLevel mLevel;
-    sys::Mutex mHandlerLock;
+    mt::Mutex mHandlerLock;
     Formatter* mFormatter;
     StandardFormatter mDefaultFormatter; 
 };

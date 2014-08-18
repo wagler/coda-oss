@@ -44,4 +44,12 @@
 #include "mt/LinuxCPUAffinityInitializer.h"
 #include "mt/LinuxCPUAffinityThreadInitializer.h"
 
+#include "mt/ConditionVar.h"
+#include "mt/Mutex.h"
+#include "mt/ReadWriteMutex.h"
+#include "mt/Runnable.h"
+#include "mt/Semaphore.h"
+#include "mt/Thread.h"
+#include "mt/Process.h"
+
 #endif

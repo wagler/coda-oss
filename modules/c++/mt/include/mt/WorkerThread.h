@@ -25,9 +25,9 @@
 #define __WORKER_THREAD_H__
 
 
-#include "sys/Thread.h"
-#include "mt/RequestQueue.h"
-#include "str/Convert.h"
+#include <mt/Thread.h>
+#include <mt/RequestQueue.h>
+#include <str/Convert.h>
 
 
 
@@ -43,7 +43,7 @@ namespace mt
  *  implemented by deriving the performTask function.  The thread 
  *  runs until the program is stopped.
  */
-template <typename Request_T> class WorkerThread : public sys::Thread
+template <typename Request_T> class WorkerThread : public mt::Thread
 {
 public:
     //! Constructor
@@ -96,7 +96,7 @@ public:
      */
     std::string getThreadId()
     {
-	return str::toString<long>(sys::getThreadID());
+	return str::toString<long>(mt::getThreadID());
     }
 protected:
 

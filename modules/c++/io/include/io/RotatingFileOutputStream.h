@@ -24,7 +24,8 @@
 #define __IO_ROTATING_FILE_STREAMS_H__
 
 #include <import/sys.h>
-#include "io/CountingStreams.h"
+#include <io/CountingStreams.h>
+#include <io/File.h>
 
 namespace io
 {
@@ -38,7 +39,7 @@ public:
     RotatingFileOutputStream(const std::string& filename,
                              unsigned long maxBytes = 0,
                              size_t backupCount = 0, int creationFlags =
-                                     sys::File::CREATE | sys::File::TRUNCATE);
+                                     File::CREATE | File::TRUNCATE);
 
     virtual ~RotatingFileOutputStream()
     {

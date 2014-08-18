@@ -29,7 +29,7 @@ io::FileOutputStreamIOS::FileOutputStreamIOS(const char* outputFile,
 {
     std::ios::openmode mode = std::ios::out;
 
-    if ( (creationFlags & sys::File::TRUNCATE) != sys::File::TRUNCATE ||
+    if ( (creationFlags & io::File::TRUNCATE) != io::File::TRUNCATE ||
             (creationFlags & std::ios::app) == std::ios::app)
         mode |= std::ios::app;
 
@@ -41,7 +41,7 @@ io::FileOutputStreamIOS::FileOutputStreamIOS(const std::string& outputFile,
 {
     std::ios::openmode mode = std::ios::out;
 
-    if ( (creationFlags & sys::File::TRUNCATE) != sys::File::TRUNCATE ||
+    if ( (creationFlags & io::File::TRUNCATE) != io::File::TRUNCATE ||
             (creationFlags & std::ios::app) == std::ios::app)
         mode |= std::ios::app;
 

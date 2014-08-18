@@ -26,7 +26,7 @@
 #if !defined(USE_IO_STREAMS)
 
 #include "except/Exception.h"
-#include "sys/File.h"
+#include "io/File.h"
 #include "io/InputStream.h"
 #include "io/SeekableStreams.h"
 
@@ -53,7 +53,7 @@ namespace io
 class FileInputStreamOS : public SeekableInputStream
 {
 protected:
-    sys::File mFile;
+    io::File mFile;
 public:
 
     //!  Constructor
@@ -69,11 +69,11 @@ public:
     {
         // Let this SystemException slide for now
         mFile.create(inputFile,
-                     sys::File::READ_ONLY,
-                     sys::File::EXISTING);
+                     io::File::READ_ONLY,
+                     io::File::EXISTING);
     }
 
-    FileInputStreamOS(const sys::File& inputFile)
+    FileInputStreamOS(const io::File& inputFile)
     {
         mFile = inputFile;
     }
@@ -109,8 +109,8 @@ public:
     virtual void create(const std::string& str)
     {
         mFile.create(str,
-                     sys::File::READ_ONLY,
-                     sys::File::EXISTING);
+                     io::File::READ_ONLY,
+                     io::File::EXISTING);
 
     }
 
@@ -126,15 +126,15 @@ public:
         switch (whence)
         {
             case END:
-                from = sys::File::FROM_END;
+                from = io::File::FROM_END;
                 break;
 
             case START:
-                from = sys::File::FROM_START;
+                from = io::File::FROM_START;
                 break;
 
             default:
-                from = sys::File::FROM_CURRENT;
+                from = io::File::FROM_CURRENT;
         }
         return mFile.seekTo( off, from );
     }

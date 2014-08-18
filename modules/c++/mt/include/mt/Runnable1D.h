@@ -5,15 +5,15 @@
 #include <sstream>
 
 #include <sys/Conf.h>
-#include <sys/Runnable.h>
+#include <mt/Runnable.h>
 #include <except/Exception.h>
-#include "mt/ThreadPlanner.h"
-#include "mt/ThreadGroup.h"
+#include <mt/ThreadPlanner.h>
+#include <mt/ThreadGroup.h>
 
 namespace mt
 {
 template <typename OpT>
-class Runnable1D : public sys::Runnable
+class Runnable1D : public mt::Runnable
 {
 public:
     Runnable1D(size_t startElement,

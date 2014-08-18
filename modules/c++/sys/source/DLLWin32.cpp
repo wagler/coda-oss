@@ -31,7 +31,7 @@ void sys::DLLException::adjustMessage()
     {
         mMessage += ": ";
     }
-    mMessage += sys::Err().toString();
+    mMessage += except::Err().toString();
 }
 
 void sys::DLL::load(const std::string& libName)

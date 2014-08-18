@@ -26,6 +26,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <import/sys.h>
+#include <import/mt.h>
 
 /*!
  *  \file
@@ -58,7 +59,7 @@ inline void closeSocketOrThrow(net::Socket_T socket)
 {
     if (closesocket(socket) != 0)
     {
-        sys::SocketErr err;
+        except::SocketErr err;
         throw except::Exception(
             Ctxt("Socket close failure: " + err.toString()));
     }
@@ -79,7 +80,7 @@ inline void Win32SocketDestroy()
  */
 inline void Win32SocketInit()
 {
-    static sys::Mutex mutex;
+    static mt::Mutex mutex;
     static bool inited = false;
 
     if (!inited)

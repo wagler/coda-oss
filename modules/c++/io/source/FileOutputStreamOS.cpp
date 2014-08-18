@@ -27,14 +27,14 @@
 io::FileOutputStreamOS::FileOutputStreamOS(const std::string& str,
         int creationFlags)
 {
-    mFile.create(str, sys::File::WRITE_ONLY, creationFlags);
+    mFile.create(str, io::File::WRITE_ONLY, creationFlags);
 
 }
 
 void io::FileOutputStreamOS::create(const std::string& str,
                                     int creationFlags)
 {
-    mFile.create(str, sys::File::WRITE_ONLY, creationFlags);
+    mFile.create(str, io::File::WRITE_ONLY, creationFlags);
     if (!isOpen())
     {
         throw except::FileNotFoundException(
@@ -69,13 +69,13 @@ sys::Off_T io::FileOutputStreamOS::seek(sys::Off_T offset,
     switch (whence)
     {
     case io::Seekable::START:
-        fileWhence = sys::File::FROM_START;
+        fileWhence = io::File::FROM_START;
         break;
     case io::Seekable::END:
-        fileWhence = sys::File::FROM_END;
+        fileWhence = io::File::FROM_END;
         break;
     default:
-        fileWhence = sys::File::FROM_CURRENT;
+        fileWhence = io::File::FROM_CURRENT;
         break;
     }
     return mFile.seekTo(offset, fileWhence);
