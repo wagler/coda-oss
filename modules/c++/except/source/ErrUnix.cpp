@@ -23,7 +23,8 @@
 
 #if !defined(WIN32)
 
-#include "except/Err.h"
+#include <errno.h>
+#include <except/Err.h>
 
 int except::Err::getLast() const
 {

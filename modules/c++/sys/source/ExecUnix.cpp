@@ -68,7 +68,7 @@ int sys::ExecPipe::closePipe()
         }
         
         // all other errors
-        sys::SocketErr err;
+        except::SocketErr err;
         throw except::IOException(
                 Ctxt("Failure while closing stream to child process: " + 
                      err.toString()));

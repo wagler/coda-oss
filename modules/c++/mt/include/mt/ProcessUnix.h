@@ -49,12 +49,12 @@
 
 namespace mt
 {
-class ProcessUnix : public ProcessInterface< Pid_T >
+class ProcessUnix : public ProcessInterface< sys::Pid_T >
 {
 public:
     ProcessUnix()
     {}
-    ProcessUnix(Runnable* target): ProcessInterface< Pid_T >(target)
+    ProcessUnix(Runnable* target): ProcessInterface< sys::Pid_T >(target)
     {}
     virtual ~ProcessUnix()
     {}

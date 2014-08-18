@@ -44,7 +44,7 @@ void mt::LinuxCPUAffinityThreadInitializer::initialize()
     tid = ::gettid();
     if ( ::sched_setaffinity(tid, sizeof(mCPU), &mCPU) == -1 )
     {
-	sys::Err e;
+	except::Err e;
 	std::ostringstream errStr;
 	errStr << "Failed setting processor affinity: " << e.toString();
 	throw except::Exception(Ctxt(errStr.str()));

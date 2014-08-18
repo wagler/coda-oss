@@ -47,8 +47,8 @@ void io::File::create(const std::string& str, int accessFlags,
 void io::File::readInto(char *buffer, sys::Size_T size)
         throw (sys::SystemException)
 {
-    SSize_T bytesRead = 0;
-    Size_T totalBytesRead = 0;
+    sys::SSize_T bytesRead = 0;
+    sys::Size_T totalBytesRead = 0;
     int i;
 
     /* make sure the user actually wants data */
@@ -94,11 +94,11 @@ void io::File::readInto(char *buffer, sys::Size_T size)
 void io::File::writeFrom(const char *buffer, sys::Size_T size)
         throw (sys::SystemException)
 {
-    Size_T bytesActuallyWritten = 0;
+    sys::Size_T bytesActuallyWritten = 0;
 
     do
     {
-        const SSize_T bytesThisRead = ::write(mHandle,
+        const sys::SSize_T bytesThisRead = ::write(mHandle,
                                               buffer + bytesActuallyWritten,
                                               size - bytesActuallyWritten);
         if (bytesThisRead == -1)

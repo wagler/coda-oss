@@ -64,7 +64,7 @@ void sys::OSUnix::removeFile(const std::string& pathname) const
 {
     if (::unlink(pathname.c_str()) != 0)
     {
-        sys::Err err;
+        except::Err err;
         std::ostringstream oss;
         oss << "Failure removing file [" <<  pathname << 
             "] with error [" << err.toString() << "]";
@@ -77,7 +77,7 @@ void sys::OSUnix::removeDirectory(const std::string& pathname) const
 {
     if (::rmdir(pathname.c_str()) != 0)
     {
-        sys::Err err;
+        except::Err err;
         std::ostringstream oss;
         oss << "Failure removing directory [" <<  pathname << 
             "] with error [" << err.toString() << "]";
@@ -263,7 +263,7 @@ void sys::OSUnix::removeSymlink(const std::string& symlinkPathname) const
 {
 	if (::unlink(symlinkPathname.c_str()) != 0)
 	{
-		sys::Err err;
+		except::Err err;
 		std::ostringstream oss;
 		oss << "Failure removing symlink [" <<  symlinkPathname <<
 			"] with error [" << err.toString() << "]";

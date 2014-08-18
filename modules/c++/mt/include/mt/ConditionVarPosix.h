@@ -31,6 +31,7 @@
 #include <mt/MutexPosix.h>
 #include <mt/ConditionVarInterface.h>
 #include <pthread.h>
+#include <memory>
 
 namespace mt
 {

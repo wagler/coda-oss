@@ -95,7 +95,7 @@ inline void closeSocketOrThrow(net::Socket_T socket)
 {
     if (close(socket) != 0)
     {
-        sys::SocketErr err;
+        except::SocketErr err;
         throw except::Exception(
             Ctxt("Socket close failure: " + err.toString()));
     }
