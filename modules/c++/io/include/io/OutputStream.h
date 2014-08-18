@@ -23,7 +23,7 @@
 #ifndef __IO_OUTPUT_STREAM_H__
 #define __IO_OUTPUT_STREAM_H__
 
-#include "sys/Dbg.h"
+#include "str/Dbg.h"
 #include "sys/Conf.h"
 
 /*!

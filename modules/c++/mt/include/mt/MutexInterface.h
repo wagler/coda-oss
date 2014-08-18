@@ -27,7 +27,7 @@
 
 #include <typeinfo>
 #include <mt/MultiThreadException.h>
-#include <sys/Dbg.h>
+#include <str/Dbg.h>
 
 namespace mt
 {

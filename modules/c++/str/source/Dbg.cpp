@@ -1,10 +1,10 @@
 /* =========================================================================
- * This file is part of sys-c++ 
+ * This file is part of str-c++ 
  * =========================================================================
  * 
  * (C) Copyright 2004 - 2009, General Dynamics - Advanced Information Systems
  *
- * sys-c++ is free software; you can redistribute it and/or modify
+ * str-c++ is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
@@ -21,9 +21,9 @@
  */
 
 
-#include "sys/Dbg.h"
+#include "str/Dbg.h"
 
-void sys::dbgPrintf(const char *format, ...)
+void str::dbgPrintf(const char *format, ...)
 {
 #ifdef __DEBUG
     va_list args;
@@ -34,7 +34,7 @@ void sys::dbgPrintf(const char *format, ...)
 #endif
 }
 
-void sys::diePrintf(const char *format, ...)
+void str::diePrintf(const char *format, ...)
 {
     va_list args;
     va_start(args, format);

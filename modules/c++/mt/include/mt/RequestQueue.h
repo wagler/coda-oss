@@ -27,7 +27,7 @@
 #include <mt/Thread.h>
 #include <mt/ConditionVar.h>
 #include <mt/Mutex.h>
-#include <sys/Dbg.h>
+#include <str/Dbg.h>
 
 namespace mt
 {

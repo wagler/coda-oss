@@ -23,7 +23,7 @@
 
 #if defined(__sun)
 #include "mt/ThreadSolaris.h"
-#include "sys/Dbg.h"
+#include "str/Dbg.h"
 
 
 void mt::ThreadSolaris::start()

@@ -26,7 +26,7 @@
 
 #  if defined(__sgi)
 #include <iostream>
-#include <sys/Dbg.h>
+#include <str/Dbg.h>
 #include <memory>
 #include <unistd.h>
 #include <signal.h>

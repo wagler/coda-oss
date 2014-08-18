@@ -1,10 +1,10 @@
 /* =========================================================================
- * This file is part of sys-c++ 
+ * This file is part of str-c++ 
  * =========================================================================
  * 
  * (C) Copyright 2004 - 2009, General Dynamics - Advanced Information Systems
  *
- * sys-c++ is free software; you can redistribute it and/or modify
+ * str-c++ is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
@@ -21,8 +21,8 @@
  */
 
 
-#ifndef __DBG_H__
-#define __DBG_H__
+#ifndef __STR_DBG_H__
+#define __STR_DBG_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -80,7 +80,7 @@
  *  in question.
  */
 
-namespace sys
+namespace str
 {
 /*!
  *  Prints to DEBUG_STREAM if __DEBUG is defined
@@ -97,8 +97,8 @@ void dbgPrintf(const char *format, ...);
 void diePrintf(const char *format, ...);
 }
 
-#define dbg_printf sys::dbgPrintf
-#define die_printf sys::diePrintf
+#define dbg_printf str::dbgPrintf
+#define die_printf str::diePrintf
 #define dbg_ln(STR) dbg_printf("[%s, %d]: '%s'\n", __FILE__, __LINE__, STR)
 
 #ifdef __DEBUG

@@ -27,7 +27,7 @@
 
 #if !defined(__APPLE_CC__)
 
-#include <sys/Dbg.h>
+#include <str/Dbg.h>
 #include <mt/Mutex.h>
 #include <mt/Semaphore.h>
 
