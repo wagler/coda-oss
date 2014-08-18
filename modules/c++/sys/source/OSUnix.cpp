@@ -30,7 +30,6 @@
 #include <sstream>
 
 #include "sys/OSUnix.h"
-#include "sys/File.h"
 
 std::string sys::OSUnix::getPlatformName() const
 {
@@ -167,7 +166,7 @@ std::string sys::OSUnix::getTempName(const std::string& path,
 sys::Off_T sys::OSUnix::getSize(const std::string& path) const
 {
     struct stat buf;
-    int handle = open(path.c_str(), O_RDONLY, _SYS_DEFAULT_PERM);
+    int handle = open(path.c_str(), O_RDONLY, 0644);
     int rval = fstat(handle, &buf);
     if (rval == -1)
         throw sys::SystemException(Ctxt("Error querying file attributes"));
@@ -177,7 +176,7 @@ sys::Off_T sys::OSUnix::getSize(const std::string& path) const
 sys::Off_T sys::OSUnix::getLastModifiedTime(const std::string& path) const
 {
     struct stat buf;
-    int handle = open(path.c_str(), O_RDONLY, _SYS_DEFAULT_PERM);
+    int handle = open(path.c_str(), O_RDONLY, 0644);
     int rval = fstat(handle, &buf);
     if (rval == -1)
         throw sys::SystemException(Ctxt("Error querying file attributes"));
