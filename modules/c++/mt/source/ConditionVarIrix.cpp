@@ -74,7 +74,7 @@ void mt::ConditionVarIrix::signal()
         mNative.pop_back();
     }
     if (lStatus != 0)
-        throw mt::ConditionException("Condition Variable signal failed");
+        throw mt::ConditionVarException("Condition Variable signal failed");
 }
 
 void mt::ConditionVarIrix::wait()
@@ -118,7 +118,7 @@ void mt::ConditionVarIrix::wait(double timeout)
         delete lTimeout;
 
     if (lSignalInfo.si_signo != SIGUSR1)
-        throw mt::ConditionException("Condition Variable wait failed");
+        throw mt::ConditionVarException("Condition Variable wait failed");
 }
 
 void mt::ConditionVarIrix::broadcast()
@@ -131,7 +131,7 @@ void mt::ConditionVarIrix::broadcast()
         mNative.pop_back();
     }
     if (lStatus != 0)
-        throw mt::ConditionException("Condition Variable broadcast failed");
+        throw mt::ConditionVarException("Condition Variable broadcast failed");
 }
 
 std::vector<pid_t>& mt::ConditionVarIrix::getNative()

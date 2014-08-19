@@ -65,27 +65,27 @@ void mt::ConditionVarNSPR::dropLock()
 void mt::ConditionVarNSPR::signal()
 {
     if (PR_NotifyCondVar(mNative) != PR_SUCCESS)
-        throw mt::ConditionException("Condition Variable signal failed");
+        throw mt::ConditionVarException("Condition Variable signal failed");
 
 }
 
 void mt::ConditionVarNSPR::wait()
 {
     if (PR_WaitCondVar(mNative, PR_INTERVAL_NO_WAIT) != PR_SUCCESS)
-        throw mt::ConditionException("Condition Variable wait failed");
+        throw mt::ConditionVarException("Condition Variable wait failed");
 }
 
 void mt::ConditionVarNSPR::wait(double seconds)
 {
     double milli = seconds * 1000;
     if (PR_WaitCondVar(mNative, PR_MillisecondsToInterval((PRUint32) milli)) != PR_SUCCESS)
-        throw mt::ConditionException("Condition Variable wait failed");
+        throw mt::ConditionVarException("Condition Variable wait failed");
 }
 
 void mt::ConditionVarNSPR::broadcast()
 {
     if (PR_NotifyAllCondVar(mNative) != PR_SUCCESS)
-        throw mt::ConditionException("Condition Variable broadcast failed");
+        throw mt::ConditionVarException("Condition Variable broadcast failed");
 }
 
 PRCondVar*& mt::ConditionVarNSPR::getNative()

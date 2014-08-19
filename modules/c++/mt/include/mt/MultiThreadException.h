@@ -34,10 +34,10 @@
 namespace mt
 {
 /*!
- *  \class ConditionException
+ *  \class ConditionVarException
  *  \brief An exception class for condition variables
  */
-DECLARE_EXCEPTION(Condition)
+DECLARE_EXCEPTION(ConditionVar)
  
 /*!
  *  \class ThreadResourceException

@@ -66,14 +66,14 @@ void mt::ConditionVarSolaris::signal()
 {
     dbg_printf("Signaling condition\n");
     if (::cond_signal(&mNative) != 0)
-        throw mt::ConditionException("ConditionVar signal failed");
+        throw mt::ConditionVarException("ConditionVar signal failed");
 }
 
 void mt::ConditionVarSolaris::wait()
 {
     dbg_printf("Waiting on condition\n");
     if (::cond_wait(&mNative, &(mMutex->getNative())) != 0)
-        throw mt::ConditionException("ConditionVar wait failed");
+        throw mt::ConditionVarException("ConditionVar wait failed");
 }
 
 void mt::ConditionVarSolaris::wait(double seconds)
@@ -87,7 +87,7 @@ void mt::ConditionVarSolaris::wait(double seconds)
         if (::cond_timedwait(&mNative,
                              &(mMutex->getNative()),
                              &tout) != 0)
-            throw mt::ConditionException("ConditionVar wait failed");
+            throw mt::ConditionVarException("ConditionVar wait failed");
     }
     else
         wait();
@@ -97,7 +97,7 @@ void mt::ConditionVarSolaris::broadcast()
 {
     dbg_printf("Broadcasting condition\n");
     if (::cond_broadcast(&mNative) != 0)
-        throw mt::ConditionException("ConditionVar broadcast failed");
+        throw mt::ConditionVarException("ConditionVar broadcast failed");
 }
 
 cond_t& mt::ConditionVarSolaris::getNative()

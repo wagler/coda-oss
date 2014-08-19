@@ -66,14 +66,14 @@ void mt::ConditionVarPosix::signal()
 {
     dbg_printf("Signaling condition\n");
     if (::pthread_cond_signal(&mNative) != 0)
-        throw mt::ConditionException("ConditionVar signal failed");
+        throw mt::ConditionVarException("ConditionVar signal failed");
 }
 
 void mt::ConditionVarPosix::wait()
 {
     dbg_printf("Waiting on condition\n");
     if (::pthread_cond_wait(&mNative, &(mMutex->getNative())) != 0)
-        throw mt::ConditionException("ConditionVar wait failed");
+        throw mt::ConditionVarException("ConditionVar wait failed");
 }
 
 void mt::ConditionVarPosix::wait(double seconds)
@@ -88,7 +88,7 @@ void mt::ConditionVarPosix::wait(double seconds)
         if (::pthread_cond_timedwait(&mNative,
                                      &(mMutex->getNative()),
                                      &tout) != 0)
-            throw mt::ConditionException("ConditionVar wait failed");
+            throw mt::ConditionVarException("ConditionVar wait failed");
     }
     else
         wait();
@@ -98,7 +98,7 @@ void mt::ConditionVarPosix::broadcast()
 {
     dbg_printf("Broadcasting condition\n");
     if (::pthread_cond_broadcast(&mNative) != 0)
-        throw mt::ConditionException("ConditionVar broadcast failed");
+        throw mt::ConditionVarException("ConditionVar broadcast failed");
 }
 
 pthread_cond_t& mt::ConditionVarPosix::getNative()

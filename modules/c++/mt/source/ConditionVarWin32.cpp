@@ -83,7 +83,7 @@ void mt::ConditionVarDataWin32::wait(HANDLE externalMutex)
     if (SignalObjectAndWait(externalMutex, mSemaphore, INFINITE, FALSE) != 
         WAIT_OBJECT_0)
     {
-        throw mt::ConditionException("SignalObjectAndWait() failed");
+        throw mt::ConditionVarException("SignalObjectAndWait() failed");
     }
 
     waitImpl(externalMutex);
@@ -120,7 +120,7 @@ bool mt::ConditionVarDataWin32::wait(HANDLE externalMutex, double timeout)
         }
         return false;
     default:
-        throw mt::ConditionException("SignalObjectAndWait() failed");
+        throw mt::ConditionVarException("SignalObjectAndWait() failed");
     }
 }
 
@@ -230,7 +230,7 @@ void mt::ConditionVarWin32::wait(double timeout)
 {
     dbg_printf("Timed waiting on condition [%f]\n", timeout);
     if (!mNative.wait(mMutex->getNative(), timeout))
-        throw mt::ConditionException("Condition Variable wait failed");
+        throw mt::ConditionVarException("Condition Variable wait failed");
 }
 
 void mt::ConditionVarWin32::wait()
