@@ -48,6 +48,7 @@
 #include <sstream>
 #include <complex>
 #include <vector>
+#include <algorithm>
 #include <sys/StopWatch.h>
 #include <str/Convert.h>
 
