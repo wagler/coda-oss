@@ -59,9 +59,9 @@ struct BufferView
       section with sectionSize = 10, section() would return a new BufferView
       of size 10 and the original BufferView would be left with 90 ints.
 
-      @sectionSize size of the new section
+      \params sectionSize size of the new section
     
-      @throws except::Exception if there is not enough space 
+      \throws except::Exception if there is not enough space 
 
      */
     mem::BufferView<T> section(size_t sectionSize)
@@ -89,7 +89,7 @@ struct BufferView
       the last BufferView will have the remainder (size % n) elements if
       size % n != 0
 
-      @n target size of each BufferView fragment
+      \param n target size of each BufferView fragment
 
      */
     std::vector<BufferView> split(size_t n)
