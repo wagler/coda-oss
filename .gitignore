@@ -23,3 +23,4 @@ modules/drivers/pcre/pcre-5.0/
 modules/drivers/uuid/e2fsprogs-1.40-uuid/
 modules/drivers/xml/xerces/xerces-c-3.1.1/
 modules/drivers/zlib/zlib-1.2.7/
+/install/
