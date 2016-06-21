@@ -75,7 +75,7 @@ FILE* ExecPipe::openPipe(const std::string& command,
 
     //! create the subprocess --
     //  this is equivalent to a fork + exec
-    if (CreateProcessA(NULL, const_cast<char*>(command.c_str()), // *DO NOT* change to CreateProcessW(): "The Unicode version ... can modify the contents of this string."
+    if (CreateProcessA(NULL, const_cast<char*>(command.c_str()),
                       NULL, NULL, TRUE, 0, NULL, NULL,
                       &mStartInfo, &mProcessInfo) == 0)
     {
@@ -121,14 +121,13 @@ int ExecPipe::closePipe()
     }
 
     // in case it fails
-    FILE* tmp = mOutStream;
+    FILE* tmp = mOutStream;  if (tmp) { /* warning C4189 : '...' : local variable is initialized but not referenced */ }
     mOutStream = NULL;
-    if (tmp) { /* warning C4189 : '...' : local variable is initialized but not referenced */ }
+   
 
     DWORD dwMillisec = INFINITE;
     DWORD dwWaitStatus = 
         WaitForSingleObject(mProcessInfo.hProcess, dwMillisec);
-
     switch (dwWaitStatus) // https://msdn.microsoft.com/en-us/library/windows/desktop/ms687032(v=vs.85).aspx
     {
     case WAIT_ABANDONED: 

@@ -28,15 +28,15 @@
 
 int sys::Err::getLast() const
 {
-    return GetLastError();
+    return static_cast<int>(GetLastError());
 }
 
 std::string sys::Err::toString() const
 {
-    LPSTR buffer;
+    LPSTR buffer = NULL;
     if (FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                       FORMAT_MESSAGE_FROM_SYSTEM, NULL,
-                      mErrId, 0,
+                      static_cast<DWORD>(mErrId), 0,
                       buffer, 0, NULL) == 0)
     {
         return std::string("Unknown error code");
