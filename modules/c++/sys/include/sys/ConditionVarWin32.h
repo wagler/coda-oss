@@ -57,7 +57,7 @@ private:
 
 private:
     // # of waiting threads
-    size_t           mNumWaiters;
+    LONG           mNumWaiters;
     CRITICAL_SECTION mNumWaitersCS;
 
     // Semaphore used to queue up threads waiting for the condition to

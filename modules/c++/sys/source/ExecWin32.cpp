@@ -123,11 +123,21 @@ int ExecPipe::closePipe()
     // in case it fails
     FILE* tmp = mOutStream;
     mOutStream = NULL;
+    if (tmp) { /* warning C4189 : '...' : local variable is initialized but not referenced */ }
 
     DWORD dwMillisec = INFINITE;
     DWORD dwWaitStatus = 
         WaitForSingleObject(mProcessInfo.hProcess, dwMillisec);
 
+    switch (dwWaitStatus) // https://msdn.microsoft.com/en-us/library/windows/desktop/ms687032(v=vs.85).aspx
+    {
+    case WAIT_ABANDONED: 
+    case WAIT_OBJECT_0:
+    case WAIT_TIMEOUT:
+    case WAIT_FAILED:
+        break;
+    }
+       
     //! get the exit code
     DWORD exitCode = NULL;
     GetExitCodeProcess(mProcessInfo.hProcess, &exitCode);

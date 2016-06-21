@@ -33,7 +33,7 @@ sys::SemaphoreWin32::SemaphoreWin32(unsigned int count, size_t _maxCount)
     const LONG maxLong = std::numeric_limits<LONG>::max();
     LONG maxCount = (_maxCount > maxLong) ? maxLong : static_cast<LONG>(_maxCount);
 
-    mNative = CreateSemaphoreA(NULL, count, maxCount, NULL /*lpName*/);
+    mNative = CreateSemaphoreA(NULL, static_cast<LONG>(count), maxCount, NULL /*lpName*/);
     if (mNative == NULL)
         throw sys::SystemException("CreateSemaphore Failed");
 }

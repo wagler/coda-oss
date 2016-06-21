@@ -72,7 +72,7 @@ std::string sys::Path::normalizePath(const std::string& path)
     //get the drive parts, if any -- we will use the drive later
     sys::Path::StringPair driveParts = sys::Path::splitDrive(path);
 
-    std::vector<std::string> parts = str::Tokenizer(path, delimStr);
+    std::vector<std::string> parts(str::Tokenizer(path, delimStr));
 
     int upCount = 0;
     std::deque<std::string> pathDeque;

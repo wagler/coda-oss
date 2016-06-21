@@ -34,7 +34,10 @@ std::string sys::OSWin32::getPlatformName() const
 {
     OSVERSIONINFO info;
     info.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+#pragma warning(push)
+#pragma warning(disable: 4996) // '...' : was declared deprecated
     if (!GetVersionEx(&info))
+#pragma warning(pop)
         throw sys::SystemException("While performing GetVersionEx()");
 
     std::string platform;
@@ -198,7 +201,7 @@ sys::Off_T sys::OSWin32::getLastModifiedTime(const std::string& path) const
 
 void sys::OSWin32::millisleep(int milliseconds) const
 {
-    Sleep(milliseconds);
+    Sleep(static_cast<DWORD>(milliseconds));
 }
 
 std::string sys::OSWin32::getDSOSuffix() const
