@@ -75,7 +75,7 @@ FILE* ExecPipe::openPipe(const std::string& command,
 
     //! create the subprocess --
     //  this is equivalent to a fork + exec
-    if (CreateProcessA(NULL, const_cast<char*>(command.c_str()),
+    if (CreateProcessA(NULL, const_cast<char*>(command.c_str()), // *DO NOT* change to CreateProcessW(): "The Unicode version ... can modify the contents of this string."
                       NULL, NULL, TRUE, 0, NULL, NULL,
                       &mStartInfo, &mProcessInfo) == 0)
     {

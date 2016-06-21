@@ -26,9 +26,13 @@
 #include <cmath>
 #include "sys/File.h"
 
+#ifdef _MSC_VER // Microsoft C++
+#pragma warning(disable: 4290) // C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
+#endif
+
 void sys::File::create(const std::string& str,
                        int accessFlags,
-                       int creationFlags)
+                       int creationFlags) throw (sys::SystemException)
 {
     // If the truncate bit is on AND the file does exist,
     // we need to set the mode to TRUNCATE_EXISTING
@@ -42,9 +46,9 @@ void sys::File::create(const std::string& str,
     }
 
     mHandle = CreateFileA(str.c_str(),
-                         accessFlags,
+                         static_cast<DWORD>(accessFlags),
                          FILE_SHARE_READ, NULL,
-                         creationFlags,
+                         static_cast<DWORD>(creationFlags),
                          FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (mHandle == SYS_INVALID_HANDLE)
@@ -54,9 +58,9 @@ void sys::File::create(const std::string& str,
     mPath = str;
 }
 
-void sys::File::readInto(char *buffer, Size_T size)
+void sys::File::readInto(char *buffer, Size_T size) throw (sys::SystemException)
 {
-    static const size_t MAX_READ_SIZE = std::numeric_limits<DWORD>::max();
+    const size_t MAX_READ_SIZE = std::numeric_limits<DWORD>::max();
     size_t bytesRead = 0;
     size_t bytesRemaining = size;
 
@@ -89,9 +93,9 @@ void sys::File::readInto(char *buffer, Size_T size)
     }
 }
 
-void sys::File::writeFrom(const char *buffer, Size_T size)
+void sys::File::writeFrom(const char *buffer, Size_T size) throw (sys::SystemException)
 {
-    static const size_t MAX_WRITE_SIZE = std::numeric_limits<DWORD>::max();
+    const size_t MAX_WRITE_SIZE = std::numeric_limits<DWORD>::max();
     size_t bytesRemaining = size;
     size_t bytesWritten = 0;
 
@@ -118,19 +122,19 @@ void sys::File::writeFrom(const char *buffer, Size_T size)
     }
 }
 
-sys::Off_T sys::File::seekTo(sys::Off_T offset, int whence)
+sys::Off_T sys::File::seekTo(sys::Off_T offset, int whence) throw (sys::SystemException)
 {
     /* Ahhh!!! */
     LARGE_INTEGER largeInt;
     LARGE_INTEGER toWhere;
     largeInt.QuadPart = offset;
-    if (!SetFilePointerEx(mHandle, largeInt, &toWhere, whence))
+    if (!SetFilePointerEx(mHandle, largeInt, &toWhere, static_cast<DWORD>(whence)))
         throw sys::SystemException(Ctxt("SetFilePointer failed"));
 
     return (sys::Off_T) toWhere.QuadPart;
 }
 
-sys::Off_T sys::File::length()
+sys::Off_T sys::File::length() throw (sys::SystemException)
 {
     DWORD highOff;
     DWORD ret = GetFileSize(mHandle, &highOff);
@@ -138,7 +142,7 @@ sys::Off_T sys::File::length()
     return (sys::Off_T)(off << 32) + ret;
 }
 
-sys::Off_T sys::File::lastModifiedTime()
+sys::Off_T sys::File::lastModifiedTime() throw (sys::SystemException)
 {
     FILETIME creationTime, lastAccessTime, lastWriteTime;
     BOOL ret = GetFileTime(mHandle, &creationTime,

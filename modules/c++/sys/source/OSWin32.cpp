@@ -103,7 +103,7 @@ sys::Pid_T sys::OSWin32::getProcessId() const
 
 void sys::OSWin32::removeFile(const std::string& pathname) const
 {
-    if (DeleteFileA(pathname.c_str()) == FALSE) // // "If the function fails, the return value is zero."
+    if (DeleteFileA(pathname.c_str()) == FALSE) // "If the function succeeds, the return value is nonzero. If the function fails, the return value is zero (0)."
     {
         sys::Err err;
         std::ostringstream oss;
@@ -116,7 +116,7 @@ void sys::OSWin32::removeFile(const std::string& pathname) const
 
 void sys::OSWin32::removeDirectory(const std::string& pathname) const
 {
-    if (RemoveDirectoryA(pathname.c_str()) == FALSE) // "If the function fails, the return value is zero."
+    if (RemoveDirectoryA(pathname.c_str()) == FALSE) // "If the function succeeds, the return value is nonzero. If the function fails, the return value is zero (0)."
     {
         sys::Err err;
         std::ostringstream oss;
@@ -296,8 +296,7 @@ void sys::OSWin32::createSymlink(const std::string& origPathname,
     // --with-cxxflags="/DNTDDI_VERSION=NTDDI_WINXPSP3 /D_WIN32_WINNT=_WIN32_WINNT_WINXP"
 #ifdef NTDDI_VERSION
 #if NTDDI_VERSION >= 0x06000000
-    if(!CreateSymbolicLinkA(const_cast<char*>(symlinkPathname.c_str()),
-                           const_cast<char*>(origPathname.c_str()), true))
+    if(!CreateSymbolicLinkA(symlinkPathname.c_str(), origPathname.c_str(), true))
     {
         throw sys::SystemException(Ctxt(
             "Call to CreateSymbolicLink() has failed"));
@@ -315,7 +314,7 @@ void sys::OSWin32::createSymlink(const std::string& origPathname,
 
 void sys::OSWin32::removeSymlink(const std::string& symlinkPathname) const
 {
-	if (RemoveDirectoryA(symlinkPathname.c_str()) == FALSE) // "If the function fails, the return value is zero."
+	if (RemoveDirectoryA(symlinkPathname.c_str()) == FALSE) // "If the function succeeds, the return value is nonzero. If the function fails, the return value is zero (0)."
     {
         sys::Err err;
         std::ostringstream oss;
