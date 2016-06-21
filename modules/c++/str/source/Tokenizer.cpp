@@ -26,18 +26,18 @@
 
 str::Tokenizer::Tokenizer(const std::string& str, const std::string& delim)
 {
-    int str_l = (int)str.length();
-    int pos = 0;
-    int start, end;
-    while (true)
+    const std::string::size_type str_l = str.length();
+    std::string::size_type pos = 0;
+    std::string::size_type start=0, end;
+    while (start != std::string::npos) // npos is -1
     {
-        start = (int)str.find_first_not_of(delim, pos);
-        if (start == (int)std::string::npos)
+        start = str.find_first_not_of(delim, pos);
+        if (start == std::string::npos)
         {
             break;
         }
-        end = (int)str.find_first_of(delim, start);
-        if (end == (int)std::string::npos)
+        end = str.find_first_of(delim, start);
+        if (end == std::string::npos)
         {
             end = str_l;
         }

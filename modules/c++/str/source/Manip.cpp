@@ -29,7 +29,7 @@
 
 void str::trim(std::string & s)
 {
-    unsigned int i;
+    std::string::size_type i;
     for (i = 0; i < s.length(); i++)
     {
         if (!isspace(s[i]))
@@ -49,9 +49,9 @@ void str::trim(std::string & s)
 
 bool str::endsWith(const std::string & s, const std::string & match)
 {
-    int mLen = match.length();
-    int sLen = s.length();
-    for (int i = 0; i < sLen && i < mLen; ++i)
+    const std::string::size_type mLen = match.length();
+    const std::string::size_type sLen = s.length();
+    for (std::string::size_type i = 0; i < sLen && i < mLen; ++i)
         if (!(s[sLen - i - 1] == match[mLen - i - 1]))
             return false;
     return sLen >= mLen;
@@ -59,9 +59,9 @@ bool str::endsWith(const std::string & s, const std::string & match)
 
 bool str::startsWith(const std::string & s, const std::string & match)
 {
-    int mLen = match.length();
-    int sLen = s.length();
-    for (int i = 0; i < sLen && i < mLen; ++i)
+    const std::string::size_type mLen = match.length();
+    const std::string::size_type sLen = s.length();
+    for (std::string::size_type i = 0; i < sLen && i < mLen; ++i)
         if (!(s[i] == match[i]))
             return false;
     return sLen >= mLen;
@@ -72,7 +72,7 @@ size_t str::replace(std::string& str,
                     const std::string& replace,
                     size_t start)
 {
-    size_t index = str.find(search, start);
+    const std::string::size_type index = str.find(search, start);
 
     if (index != std::string::npos)
     {
@@ -91,7 +91,7 @@ void str::replaceAll(std::string& string,
                      const std::string& search,
                      const std::string& replace)
 {
-    size_t start = 0;
+    std::string::size_type start = 0;
     while (start < string.length())
     {
         start = str::replace(string, 
@@ -203,14 +203,14 @@ std::vector<std::string> str::split(const std::string& s,
         const std::string& splitter, size_t maxSplit)
 {
     std::vector < std::string > vec;
-    int str_l = (int) s.length();
-    int split_l = (int) splitter.length();
-    int pos = 0;
-    int nextPos;
+    const std::string::size_type str_l = s.length();
+    const std::string::size_type split_l = splitter.length();
+    std::string::size_type pos = 0;
+    std::string::size_type nextPos;
     while (pos < str_l && maxSplit != 1)
     {
-        nextPos = (int) s.find(splitter, pos);
-        if (nextPos == (int)std::string::npos)
+        nextPos = s.find(splitter, pos);
+        if (nextPos == std::string::npos)
             nextPos = str_l;
         if (nextPos != pos)
             vec.push_back(s.substr(pos, nextPos - pos));
@@ -225,39 +225,41 @@ std::vector<std::string> str::split(const std::string& s,
     return vec;
 }
 
-static int transformCheck(int c, int (*transform)(int))
+static char transformCheck(int c, int (*transform)(int))
 {
     // Ensure the character can be represented
     // as an unsigned char or is 'EOF', as the
     // behavior for all other characters is undefined
+    int retval;
     if ((c >= 0 && c <= UCHAR_MAX) || c == EOF)
     {
-        return transform(c);
+        retval = transform(c);
     }
     else
     {
         // Invalid char for transform: no-op
-        return c;
+        retval = c;
     }
+    return static_cast<char>(c);
 }
 
-static int tolowerCheck(int c)
+static char tolowerCheck(int c)
 {
-    return transformCheck(c, (int(*)(int)) tolower);
+    return transformCheck(c, tolower);
 }
 
-static int toupperCheck(int c)
+static char toupperCheck(int c)
 {
-    return transformCheck(c, (int(*)(int)) toupper);
+    return transformCheck(c, toupper);
 }
 
 void str::lower(std::string& s)
 {
-    std::transform(s.begin(), s.end(), s.begin(), (int(*)(int)) tolowerCheck);
+    std::transform(s.begin(), s.end(), s.begin(), tolowerCheck);
 }
 
 void str::upper(std::string& s)
 {
-    std::transform(s.begin(), s.end(), s.begin(), (int(*)(int)) toupperCheck);
+    std::transform(s.begin(), s.end(), s.begin(), toupperCheck);
 }
 
