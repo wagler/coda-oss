@@ -24,6 +24,8 @@
 #if defined(WIN32)
 
 #include <WinSock.h>
+#pragma comment(lib, "ws2_32")
+
 #include "sys/Err.h"
 
 int sys::Err::getLast() const
