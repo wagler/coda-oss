@@ -135,12 +135,20 @@ void sys::UTCDateTime::getTime(time_t numSecondsSinceEpoch, tm& t) const
     // Would like to use the reentrant version.  If we don't have one, cross
     // our fingers and hope the regular function actually is reentrant
     // (supposedly this is the case on Windows).
-#ifdef HAVE_GMTIME_R
+#if defined(HAVE_GMTIME_R)
     if (::gmtime_r(&numSecondsSinceEpoch, &t) == NULL)
     {
         int const errnum = errno;
         throw except::Exception(Ctxt("gmtime_r() failed (" +
             std::string(::strerror(errnum)) + ")"));
+#elif defined(__STDC_WANT_SECURE_LIB__) // Windows only? 
+    const errno_t errnum = ::gmtime_s(&t, &numSecondsSinceEpoch);
+    if (errnum != 0) // "Zero if successful."
+    {
+        char buf[256];
+        (void) strerror_s(buf, errnum);
+        throw except::Exception(Ctxt("gmtime_s failed (" +
+            std::string(buf) + ")"));
     }
 #else
     tm const * const gmTimePtr = ::gmtime(&numSecondsSinceEpoch);
