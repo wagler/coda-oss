@@ -331,8 +331,8 @@ void sys::OSWin32::getMemInfo(size_t& totalPhysMem, size_t& freePhysMem) const
     memInfo.dwLength = sizeof(MEMORYSTATUSEX);
     if(GlobalMemoryStatusEx(&memInfo))
     {
-        totalPhysMem = memInfo.ullTotalPhys;
-        freePhysMem = memInfo.ullAvailPhys;
+        totalPhysMem = static_cast<size_t>(memInfo.ullTotalPhys);
+        freePhysMem = static_cast<size_t>(memInfo.ullAvailPhys);
 
         // convert to megabytes
         totalPhysMem /= (1024*1024);

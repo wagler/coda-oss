@@ -68,13 +68,11 @@ logging::setupLogger(const std::string& program,
     else
     {
         // create a rotating logger
-        logCount = (logCount < 0) ? 0 : logCount;
-        logBytes = (logBytes < 0) ? 0 : logBytes;
         if (logBytes > 0)
         {
             logHandler.reset(new logging::RotatingFileHandler(logFile,
-                                                              logBytes,
-                                                              logCount));
+                                                              static_cast<long>(logBytes),
+                                                              static_cast<long>(logCount)));
         }
         // create regular logging to one file
         else

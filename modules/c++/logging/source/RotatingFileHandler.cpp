@@ -70,8 +70,8 @@ RotatingFileHandler::RotatingFileHandler(const std::string& fname,
     
     // create log file
     creationFlags = sys::File::CREATE | sys::File::TRUNCATE;
-    mStream.reset(new io::RotatingFileOutputStream(fname, maxBytes,
-                                                   backupCount, creationFlags));
+    mStream.reset(new io::RotatingFileOutputStream(fname, static_cast<unsigned long>(maxBytes),
+                                                   static_cast<size_t>(backupCount), creationFlags));
 }
 
 RotatingFileHandler::~RotatingFileHandler()
