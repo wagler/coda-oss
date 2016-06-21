@@ -41,7 +41,7 @@ void sys::File::create(const std::string& str,
         creationFlags = ~sys::File::TRUNCATE & creationFlags;
     }
 
-    mHandle = CreateFile(str.c_str(),
+    mHandle = CreateFileA(str.c_str(),
                          accessFlags,
                          FILE_SHARE_READ, NULL,
                          creationFlags,

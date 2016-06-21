@@ -139,7 +139,7 @@ public:
 protected:
 
 #ifdef _WIN32
-    STARTUPINFO mStartInfo;
+    STARTUPINFOA mStartInfo;
     PROCESS_INFORMATION mProcessInfo;
 #else
     pid_t mProcess;

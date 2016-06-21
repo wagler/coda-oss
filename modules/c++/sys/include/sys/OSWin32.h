@@ -230,7 +230,7 @@ public:
     virtual std::string findNextFile();
 
     HANDLE mHandle;
-    WIN32_FIND_DATA mFileData;
+    WIN32_FIND_DATAA mFileData;
 
 };
 

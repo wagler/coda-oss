@@ -40,7 +40,7 @@ void sys::DLL::load(const std::string& libName)
     mLibName = libName;
 
     // Next we load the library
-    mLib = LoadLibrary( mLibName.c_str() );
+    mLib = LoadLibraryA( mLibName.c_str() );
 
 
     // Now we check the return value

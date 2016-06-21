@@ -63,14 +63,14 @@ std::string sys::OSWin32::getNodeName() const
 {
     char buffer[512];
     size_t size = 512;
-    if (GetComputerName(buffer, (LPDWORD)&size))
+    if (GetComputerNameA(buffer, (LPDWORD)&size))
         return std::string(buffer, size);
     else return std::string("Unknown");
 }
 
 bool sys::OSWin32::exists(const std::string& path) const
 {
-    const DWORD what = GetFileAttributes(path.c_str());
+    const DWORD what = GetFileAttributesA(path.c_str());
 
     if (what == INVALID_FILE_ATTRIBUTES)
     {
@@ -100,7 +100,7 @@ sys::Pid_T sys::OSWin32::getProcessId() const
 
 void sys::OSWin32::removeFile(const std::string& pathname) const
 {
-    if (DeleteFile(pathname.c_str()) != true)
+    if (DeleteFileA(pathname.c_str()) != true)
     {
         sys::Err err;
         std::ostringstream oss;
@@ -113,7 +113,7 @@ void sys::OSWin32::removeFile(const std::string& pathname) const
 
 void sys::OSWin32::removeDirectory(const std::string& pathname) const
 {
-    if (RemoveDirectory(pathname.c_str()) != true)
+    if (RemoveDirectoryA(pathname.c_str()) != true)
     {
         sys::Err err;
         std::ostringstream oss;
@@ -129,7 +129,7 @@ bool sys::OSWin32::move(const std::string& path,
 {
     // MOVEFILE_REPLACE_EXISTING - forcefully move the file
     // MOVEFILE_WRITE_THROUGH    - report status after performing a flush
-    return (MoveFileEx(path.c_str(), 
+    return (MoveFileExA(path.c_str(), 
                        newPath.c_str(), 
                        MOVEFILE_REPLACE_EXISTING | 
                        MOVEFILE_WRITE_THROUGH)) ? (true) : (false);
@@ -143,7 +143,7 @@ bool sys::OSWin32::isFile(const std::string& path) const
     //  1) Exists
     //  2) Not Directory
     //  3) Not Archive - we aren't doing that...
-    const DWORD what = GetFileAttributes(path.c_str());
+    const DWORD what = GetFileAttributesA(path.c_str());
     return (what != INVALID_FILE_ATTRIBUTES &&
             !(what & FILE_ATTRIBUTE_DIRECTORY));
 }
@@ -151,20 +151,20 @@ bool sys::OSWin32::isFile(const std::string& path) const
 
 bool sys::OSWin32::isDirectory(const std::string& path) const
 {
-    const DWORD what = GetFileAttributes(path.c_str());
+    const DWORD what = GetFileAttributesA(path.c_str());
     return (what != INVALID_FILE_ATTRIBUTES &&
             (what & FILE_ATTRIBUTE_DIRECTORY));
 }
 
 bool sys::OSWin32::makeDirectory(const std::string& path) const
 {
-    return (CreateDirectory(path.c_str(), NULL)) ? (true): (false);
+    return (CreateDirectoryA(path.c_str(), NULL)) ? (true): (false);
 }
 
 std::string sys::OSWin32::getCurrentWorkingDirectory() const
 {
     char buffer[MAX_PATH + 1];
-    DWORD where = GetCurrentDirectory(MAX_PATH + 1, buffer);
+    DWORD where = GetCurrentDirectoryA(MAX_PATH + 1, buffer);
     if (where == 0)
         throw sys::SystemException("In getCurrentWorkingDirectory()");
     std::string __str(buffer, where);
@@ -173,14 +173,14 @@ std::string sys::OSWin32::getCurrentWorkingDirectory() const
 
 bool sys::OSWin32::changeDirectory(const std::string& path) const
 {
-    return SetCurrentDirectory(path.c_str()) ? true : false;
+    return SetCurrentDirectoryA(path.c_str()) ? true : false;
 }
 
 std::string sys::OSWin32::getTempName(const std::string& path,
                                       const std::string& prefix) const
 {
     char buffer[MAX_PATH];
-    if (GetTempFileName(path.c_str(),
+    if (GetTempFileNameA(path.c_str(),
                         prefix.c_str(),
                         0, buffer) == 0) return std::string("");
     return std::string(buffer);
@@ -215,14 +215,14 @@ std::string sys::OSWin32::operator[](const std::string& s) const
 std::string sys::OSWin32::getEnv(const std::string& s) const
 {
     std::string result;
-    const DWORD size = GetEnvironmentVariable(s.c_str(), NULL, 0);
+    const DWORD size = GetEnvironmentVariableA(s.c_str(), NULL, 0);
     if (size == 0)
     {
         throw sys::SystemException(Ctxt(
             "Unable to get windows environment variable " + s));
     }
     std::vector<char> buffer(size + 1);
-    const DWORD retVal = GetEnvironmentVariable(s.c_str(), &buffer[0], size);
+    const DWORD retVal = GetEnvironmentVariableA(s.c_str(), &buffer[0], size);
     // Win32 API weirdness -- see https://msdn.microsoft.com/en-us/libary/windows/desktop/ms683188%28v=vs.85%29.aspx
     // When less then the size of the buffer is allocated, it returns the required size, including the null character
     // Otherwise, it returns the size of the variable, not including the null character
@@ -243,7 +243,7 @@ std::string sys::OSWin32::getEnv(const std::string& s) const
 
 bool sys::OSWin32::isEnvSet(const std::string& s) const
 {
-    const DWORD size = GetEnvironmentVariable(s.c_str(), NULL, 0);
+    const DWORD size = GetEnvironmentVariableA(s.c_str(), NULL, 0);
     return (size != 0);
 }
 
@@ -253,7 +253,7 @@ void sys::OSWin32::setEnv(const std::string& var,
 {
     if (overwrite || !isEnvSet(var))
     {
-        const BOOL ret = SetEnvironmentVariable(var.c_str(), val.c_str());
+        const BOOL ret = SetEnvironmentVariableA(var.c_str(), val.c_str());
         if (!ret)
         {
             throw sys::SystemException(Ctxt(
@@ -264,7 +264,7 @@ void sys::OSWin32::setEnv(const std::string& var,
 
 void sys::OSWin32::unsetEnv(const std::string& var)
 {
-    const BOOL ret = SetEnvironmentVariable(var.c_str(), NULL);
+    const BOOL ret = SetEnvironmentVariableA(var.c_str(), NULL);
     if (!ret)
     {
         throw sys::SystemException(Ctxt("Unable to unset windows environment variable " + var));
@@ -293,7 +293,7 @@ void sys::OSWin32::createSymlink(const std::string& origPathname,
     // --with-cxxflags="/DNTDDI_VERSION=NTDDI_WINXPSP3 /D_WIN32_WINNT=_WIN32_WINNT_WINXP"
 #ifdef NTDDI_VERSION
 #if NTDDI_VERSION >= 0x06000000
-    if(!CreateSymbolicLink(const_cast<char*>(symlinkPathname.c_str()),
+    if(!CreateSymbolicLinkA(const_cast<char*>(symlinkPathname.c_str()),
                            const_cast<char*>(origPathname.c_str()), true))
     {
         throw sys::SystemException(Ctxt(
@@ -312,7 +312,7 @@ void sys::OSWin32::createSymlink(const std::string& origPathname,
 
 void sys::OSWin32::removeSymlink(const std::string& symlinkPathname) const
 {
-	if (RemoveDirectory(symlinkPathname.c_str()) != true)
+	if (RemoveDirectoryA(symlinkPathname.c_str()) != true)
     {
         sys::Err err;
         std::ostringstream oss;
@@ -354,7 +354,7 @@ std::string sys::DirectoryWin32::findFirstFile(const std::string& dir)
 {
     std::string plusWC = dir;
     plusWC += std::string("\\*");
-    mHandle = ::FindFirstFile(plusWC.c_str(), &mFileData);
+    mHandle = ::FindFirstFileA(plusWC.c_str(), &mFileData);
     if (mHandle == INVALID_HANDLE_VALUE) 
         return "";
     return mFileData.cFileName;
@@ -362,7 +362,7 @@ std::string sys::DirectoryWin32::findFirstFile(const std::string& dir)
 
 std::string sys::DirectoryWin32::findNextFile()
 {
-    if (::FindNextFile(mHandle, &mFileData) == 0)
+    if (::FindNextFileA(mHandle, &mFileData) == 0)
         return "";
     return mFileData.cFileName;
 }
